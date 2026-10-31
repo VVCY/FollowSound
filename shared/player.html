@@ -47,6 +47,24 @@
     padding: 10px 22px; margin-top: 14px; cursor: pointer;
   }
   .hint .box { text-align: center; max-width: 320px; padding: 24px; }
+
+  /* 麦克风状态条：接不上时明说原因，别让画面继续假装在跟着声音动 */
+  #micChip {
+    position: fixed; left: 50%; top: calc(40px + env(safe-area-inset-top));
+    transform: translateX(-50%);
+    display: none; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 999px;
+    background: rgba(20, 24, 32, .86); color: #e8ecf3;
+    font: 12px/1.3 -apple-system, "PingFang SC", "Noto Sans CJK SC", sans-serif;
+    white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  #micChip.on { display: inline-flex; }
+  #micChip b { font-weight: 600; color: #ff8c9f; }
+  #micChip button {
+    font: inherit; color: #0b0d12; background: #fff; border: 0; border-radius: 999px;
+    padding: 4px 10px;
+  }
+  #micChip button.ghost { background: rgba(255,255,255,.14); color: #e8ecf3; }
 </style>
 </head>
 <body>
@@ -72,6 +90,12 @@
   </div>
 </div>
 
+<div id="micChip">
+  <span>麦克风没接上 · <b id="micErr"></b></span>
+  <button id="micRetry">重试</button>
+  <button id="micSetting" class="ghost">去设置</button>
+</div>
+
 <script>
   // 出错时把错误打到页面上：覆盖层场景里没有控制台可看，静默失败最难查
   window.addEventListener('error', function (e) {
@@ -93,7 +117,8 @@
   var fs = FollowSound.create(stage, {
     style: q.get('style') || localStorage.getItem('fs.style') || 'band',
     theme: q.get('theme') || localStorage.getItem('fs.theme') || 'ocean',
-    height: Number(q.get('height') || localStorage.getItem('fs.height') || 180)
+    height: Number(q.get('height') || localStorage.getItem('fs.height') || 180),
+    demo: isDemo
   });
   window.fs = fs;
   fs.start();
@@ -132,31 +157,61 @@
     micBtn.classList.toggle('on', fs.isMic());
     micBtn.onclick = function () {
       if (fs.isMic()) { fs.detachMic(); micBtn.classList.remove('on'); }
-      else { fs.attachMic().then(function () { micBtn.classList.add('on'); }).catch(function () {}); }
+      else { connect().then(function (ok) { micBtn.classList.toggle('on', !!ok); }); }
     };
   }
 
   // ---- 麦克风 ----
   var hint = document.getElementById('hint');
-  function grant() {
-    fs.attachMic().then(function () { hint.classList.add('hide'); }).catch(function () {
-      hint.querySelector('.box').innerHTML = '<div>麦克风没有打开。可以在系统设置里允许「随响」使用麦克风，或者先看演示动画。</div>';
-      fs.setDemo(true);
-      setTimeout(function () { hint.classList.add('hide'); }, 1600);
-    });
+  var chip = document.getElementById('micChip');
+  var chipErr = document.getElementById('micErr');
+  var chipSetting = document.getElementById('micSetting');
+  var attaching = null;
+
+  function showChip(name) {
+    chipErr.textContent = name || '未知原因';
+    chip.classList.add('on');
+    console.log('mic fail: ' + name);
   }
+
+  function connect() {
+    if (fs.isMic()) return Promise.resolve(true);
+    if (attaching) return attaching;   // 连点两下别开两条流
+    attaching = fs.attachMic().then(function () {
+      attaching = null;
+      hint.classList.add('hide');
+      chip.classList.remove('on');
+      var b = document.getElementById('micBtn');
+      if (b) b.classList.add('on');
+      // 打到宿主日志里：悬浮层/App 内没有控制台，出问题只能靠这一行
+      console.log('mic ok: ' + JSON.stringify(window.fsMicInfo()));
+      return true;
+    }).catch(function (e) {
+      attaching = null;
+      hint.classList.add('hide');
+      showChip((e && e.name) || (e && e.message) || 'Error');
+      return false;
+    });
+    return attaching;
+  }
+
+  document.getElementById('micRetry').onclick = function () { connect(); };
+  chipSetting.onclick = function () {
+    try { if (window.FSHost && window.FSHost.settings) FSHost.settings(); } catch (e) {}
+  };
+
+  // 宿主（Android 拿到系统权限后 / 拒了权限时 / Electron 主进程）调用
+  window.fsEnsureMic = function () { return connect(); };
+  window.fsRetryMic = window.fsEnsureMic;   // 旧调用点的别名
+  // 宿主已经知道失败原因（比如用户在系统弹窗里点了拒绝），不用再试一次，直接亮状态条
+  window.fsMicError = function (name) { hint.classList.add('hide'); showChip(name); };
+  window.fsMicInfo = function () { return fs.micInfo ? fs.micInfo() : null; };
+
   if (isDemo) { hint.classList.add('hide'); fs.setDemo(true); }
   else {
-    document.getElementById('grant').onclick = grant;
-    // 桌面端（Electron / 已授权环境）不需要点击，直接试
-    if (q.get('autostart') === '1' || location.protocol === 'file:') {
-      fs.attachMic().then(function () {
-        hint.classList.add('hide');
-        // 控制条上的「接麦克风」要跟着变成已连接，否则看起来像没接上
-        var b = document.getElementById('micBtn');
-        if (b) b.classList.add('on');
-      }).catch(function () { hint.classList.add('hide'); fs.setDemo(true); });
-    }
+    document.getElementById('grant').onclick = function () { connect(); };
+    // 桌面端（Electron / 已授权环境）不用点，直接试；Android 只有拿到系统权限才传 1
+    if (q.get('autostart') === '1' || location.protocol === 'file:') connect();
   }
 
   // 供宿主（Electron 主进程 / Android）调用

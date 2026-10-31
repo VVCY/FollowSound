@@ -1,13 +1,18 @@
 package app.followsound.android
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
+import android.util.Log
+import android.webkit.ConsoleMessage
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.content.ContextCompat
 import androidx.webkit.WebViewAssetLoader
 
 /**
@@ -17,10 +22,21 @@ import androidx.webkit.WebViewAssetLoader
  */
 object Web {
     const val BASE = "https://appassets.androidplatform.net/assets/"
+    private const val TAG = "FollowSound"
 
+    fun hasMic(ctx: Context): Boolean =
+        ContextCompat.checkSelfPermission(ctx, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED
+
+    /**
+     * @param onNeedMic 页面要麦克风、但 App 自己还没拿到系统权限时回调，
+     *   由宿主去 requestPermissions，拿到后再让页面重试 getUserMedia。
+     *
+     *   两层权限是分开的：WebView 的 onPermissionRequest 只决定「这个网页」能不能用麦克风，
+     *   App 级别的 RECORD_AUDIO 是另一层。缺这一层时就算 grant 了，流也是死的。
+     */
     @SuppressLint("SetJavaScriptEnabled")
-    fun setup(view: WebView, ctx: Context) {
-        val loader = WebViewAssetLoader.Builder()
+    fun setup(view: WebView, ctx: Context, onNeedMic: (() -> Unit)? = null) {        val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(ctx))
             .build()
 
@@ -46,8 +62,24 @@ object Web {
         }
         view.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest?) {
+                if (request == null) return
+                val audio = request.resources
+                    .filter { it == PermissionRequest.RESOURCE_AUDIO_CAPTURE }
+                    .toTypedArray()
                 // 只放行音频，别的一概不给
-                request?.grant(arrayOf(android.webkit.PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+                if (audio.isEmpty()) { request.deny(); return }
+                if (!hasMic(ctx)) {
+                    // 缺系统权限时 grant 只会得到一个打不开的流，页面随后静默变成演示动画
+                    request.deny()
+                    onNeedMic?.invoke()
+                    return
+                }
+                request.grant(audio)
+            }
+
+            override fun onConsoleMessage(m: ConsoleMessage?): Boolean {
+                m?.let { Log.d(TAG, "[web] ${it.message()}") }
+                return true
             }
         }
     }

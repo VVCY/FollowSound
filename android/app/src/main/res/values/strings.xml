@@ -5,4 +5,5 @@
     <string name="overlay_off">关闭悬浮窗</string>
     <string name="check_update">检查更新</string>
     <string name="overlay_channel">悬浮光带</string>
+    <string name="mic_denied">没拿到麦克风权限，光带不会随声音变化。可点页面上的「去设置」或在系统设置里允许「随响」使用麦克风。</string>
 </resources>

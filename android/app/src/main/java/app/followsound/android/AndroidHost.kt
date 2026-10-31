@@ -1,6 +1,9 @@
 package app.followsound.android
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.webkit.JavascriptInterface
 
 /**
@@ -11,7 +14,8 @@ import android.webkit.JavascriptInterface
  */
 class AndroidHost(context: Context) {
 
-    private val sp = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val ctx = context.applicationContext
+    private val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     @JavascriptInterface
     fun set(key: String, value: String) {
@@ -21,6 +25,17 @@ class AndroidHost(context: Context) {
 
     @JavascriptInterface
     fun get(key: String): String = if (key in ALLOWED) sp.getString(key, "") ?: "" else ""
+
+    /**
+     * 麦克风被拒后「去设置」：直接落到本 App 的权限页。
+     * 页面自己跳不了，Android 也不会把永久拒绝的用户再弹一次窗。
+     */
+    @JavascriptInterface
+    fun settings() {
+        val i = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ctx.startActivity(i)
+    }
 
     companion object {
         const val PREFS = "followsound"

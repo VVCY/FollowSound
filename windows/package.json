@@ -1,7 +1,7 @@
 {
   "name": "followsound",
   "productName": "FollowSound",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "随响 FollowSound —— 把说话的音量变成屏幕底部的光带",
   "main": "src/main.js",
   "author": { "name": "VVCY", "url": "https://github.com/VVCY" },

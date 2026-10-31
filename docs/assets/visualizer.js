@@ -68,7 +68,10 @@
     var prevLevel = 0, spike = 0;
 
     var mic = null;      // {ctx, analyser, timeBuf, freqBuf, stream}
-    var demoMode = !opts.mic;
+    // 默认不演示。以前默认开，麦克风挂了画面上照样有东西在动，
+    // 看起来「好像能用了」，实际一个音都没收到。
+    var demoMode = !!opts.demo;
+    var micError = null;
     var peakDB = -30;
 
     var dpr = Math.min(global.devicePixelRatio || 1, 2);
@@ -409,8 +412,12 @@
       stop: function () { if (raf) cancelAnimationFrame(raf); raf = null; last = 0; },
       /** 接麦克风：返回 Promise，失败时抛出（浏览器/Android 需要用户手势触发） */
       attachMic: function () {
+        if (mic) return Promise.resolve(true);
         var md = navigator.mediaDevices;
-        if (!md || !md.getUserMedia) return Promise.reject(new Error('no getUserMedia'));
+        if (!md || !md.getUserMedia) {
+          micError = 'no getUserMedia';
+          return Promise.reject(new Error(micError));
+        }
         return md.getUserMedia({
           audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
         }).then(function (stream) {
@@ -423,8 +430,24 @@
           src.connect(an);
           mic = { ctx: ac, analyser: an, timeBuf: new Float32Array(an.fftSize),
                   freqBuf: new Uint8Array(an.frequencyBinCount), stream: stream };
+          micError = null;
           demoMode = false;
+          // 移动端 Web Audio 受自动播放策略约束，new AudioContext() 可能停在 suspended。
+          // 停在 suspended 时 analyser 读出来全是 0 —— 现象就是「授权了但没反应」。
+          resumeCtx(ac);
+          // 被别的 App 抢走麦克风（通话/录音）时轨道会 ended，自动接回来一次
+          stream.getAudioTracks().forEach(function (t) {
+            t.onended = function () {
+              if (mic && mic.stream === stream) {
+                mic = null; micError = 'track ended';
+                setTimeout(function () { if (!mic) api.attachMic().catch(function () {}); }, 400);
+              }
+            };
+          });
           return true;
+        }).then(null, function (err) {
+          micError = (err && (err.name || err.message)) || 'unknown';
+          throw err;
         });
       },
       detachMic: function () {
@@ -432,12 +455,36 @@
         try { mic.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
         try { mic.ctx.close(); } catch (e) {}
         mic = null;
-        demoMode = true;
+        demoMode = false;
       },
       setDemo: function (on) { demoMode = !!on; },
-      isMic: function () { return !!mic; }
+      isMic: function () { return !!mic; },
+      /** 诊断用：一眼看出是「没权限」「音频上下文没跑」还是「在收但没有声」 */
+      micInfo: function () {
+        if (!mic) return { ok: false, error: micError, demo: demoMode };
+        var t = mic.stream.getAudioTracks()[0];
+        return {
+          ok: true, error: null, demo: demoMode,
+          state: mic.ctx.state, sampleRate: mic.ctx.sampleRate,
+          trackState: t ? t.readyState : null,
+          label: t && t.label ? t.label : '',
+          level: env
+        };
+      }
     };
     return api;
+  }
+
+  /** 把停在 suspended 的 AudioContext 叫醒；叫不醒就等用户下一次触摸 */
+  function resumeCtx(ac) {
+    if (ac.state === 'running') return;
+    try { ac.resume(); } catch (e) {}
+    var unlock = function () {
+      if (ac.state !== 'running') { try { ac.resume(); } catch (e) {} }
+    };
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) {
+      global.addEventListener(ev, unlock, { passive: true });
+    });
   }
 
   global.FollowSound = { create: create, STYLES: STYLES, themeByKey: themeByKey };
