@@ -41,6 +41,7 @@
 </head>
 <body>
 <canvas id="stage"></canvas>
+<pre id="err" style="display:none;position:fixed;left:8px;top:8px;color:#ff5a7a;font:12px/1.4 monospace;background:rgba(0,0,0,.6);padding:8px;border-radius:6px;max-width:90vw;white-space:pre-wrap"></pre>
 
 <div class="chrome" id="chrome">
   <label>特效</label>
@@ -61,6 +62,13 @@
   </div>
 </div>
 
+<script>
+  // 出错时把错误打到页面上：覆盖层场景里没有控制台可看，静默失败最难查
+  window.addEventListener('error', function (e) {
+    var el = document.getElementById('err');
+    if (el) { el.style.display = 'block'; el.textContent = 'error: ' + (e.message || e.error); }
+  });
+</script>
 <script src="themes.js"></script>
 <script src="visualizer.js"></script>
 <script>
@@ -68,6 +76,10 @@
   var q = new URLSearchParams(location.search);
   var isDemo = q.get('demo') === '1';
   var stage = document.getElementById('stage');
+  // 覆盖层场景必须透明；全屏预览（Android 现场模式 / 本地看图）想要一层底色
+  var bg = q.get('bg');
+  if (bg) document.body.style.background = '#' + bg.replace('#', '');
+
   var fs = FollowSound.create(stage, {
     style: q.get('style') || localStorage.getItem('fs.style') || 'band',
     theme: q.get('theme') || localStorage.getItem('fs.theme') || 'ocean',

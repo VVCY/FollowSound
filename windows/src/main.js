@@ -168,13 +168,8 @@ function rebuildTray() {
       }))
     },
     { type: 'separator' },
-    {
-      label: '跟着屏幕走',
-      type: 'checkbox',
-      checked: settings.autoFollow !== false,
-      click: (i) => { settings.autoFollow = i.checked; saveSettings(); }
-    },
-    { label: '重连麦克风', click: () => win?.webContents.executeJavaScript('window.fs && fs.isMic() ? 1 : 0') },
+    // 麦克风偶尔会被系统降级成"打开了但收不到声"，重载一次页面就能重新申请
+    { label: '重连麦克风', click: () => win?.webContents.reload() },
     { type: 'separator' },
     { label: `检查更新：${updateState}`, click: checkForUpdates },
     { label: '打开发布页', click: () => shell.openExternal(`https://github.com/${REPO.owner}/${REPO.repo}/releases`) },
