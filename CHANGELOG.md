@@ -28,6 +28,10 @@
 - macOS 改为通用二进制（arm64 + x86_64）
 - 三端打包脚本 + GitHub Actions 发布流水线
 - 三端自动更新，统一走 GitHub Releases
+- **三端安装包已实际产出**：macOS 337 KB zip / 614 KB dmg、Windows 78 MB Setup.exe / 106 MB 免安装 zip、
+  Android 4.4 MB apk，全部挂在同一个 Release 上，附 `latest.yml` 与 `SHA256SUMS.txt`
+- Android 在 Android 15 模拟器上跑通：主界面出图、前台服务悬浮层盖在桌面上、
+  悬浮层高度跟随 App 内滑块（SharedPreferences 桥）
 
 ## 0.x — 2026-10-31 之前
 

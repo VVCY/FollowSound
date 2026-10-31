@@ -38,17 +38,53 @@ followsound/
 
 ## 3. 三个平台的打包命令
 
+三端都已在 macOS 本机实测出包（2026-10-31，v1.0.0）。以下命令按实际跑通的写法记录。
+
 ```bash
 # macOS：本地出 zip + dmg（通用二进制，arm64 + x86_64）
-VERSION=1.0.0 ./macos/package.sh          # → dist/macos/
+VERSION=1.0.0 ./macos/package.sh            # → dist/macos/
 
 # Windows：在 windows/ 下
 npm install
-npx electron-builder --win --publish never  # → dist/windows/（含 latest.yml）
+npx electron-builder --win --publish never   # → dist/windows/（含 latest.yml、blockmap）
+```
 
-# Android：在 android/ 下
-gradle assembleRelease -PfsVersionName=1.0.0 -PfsVersionCode=1
-# → android/app/build/outputs/apk/release/app-release.apk
+国内网络下 electron 与 nsis 的二进制走 GitHub 会卡死，用镜像：
+
+```bash
+export ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
+export ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/
+```
+
+```bash
+# Android：需要 JDK 17 + Android SDK（platform 35 / build-tools 35）
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+export ANDROID_HOME=$HOME/Library/Android/sdk
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
+cd android && ./gradlew assembleRelease \
+  -PfsVersionName=1.0.0 -PfsVersionCode=1
+# → android/app/build/outputs/apk/release/app-release.apk（约 4.4 MB）
+```
+
+`app/build.gradle.kts` 里的 `syncShared` 会在 preBuild 前把 `../shared` 复制进 assets，
+所以 APK 里的渲染核心永远和仓库同源，不需要手工同步。
+
+### 打包后核对（别省）
+
+```bash
+# Windows：托盘图标、更新配置、共享资源都在包里？
+npx @electron/asar list dist/windows/win-unpacked/resources/app.asar | grep -E "^/(build|src)"
+cat dist/windows/win-unpacked/resources/app-update.yml
+ls dist/windows/win-unpacked/resources/shared/
+
+# Android：包名、版本、权限、assets、签名
+$ANDROID_HOME/build-tools/35.0.0/aapt2 dump badging <apk> | head -20
+unzip -l <apk> | grep assets/
+$ANDROID_HOME/build-tools/35.0.0/apksigner verify --print-certs <apk>
+
+# Windows 端渲染自检（不需要 Windows 机器，Electron 跨平台跑同一份页面）
+cd windows && npx electron tools/smoke.js
 ```
 
 ## 4. 发布流程（自动化）
@@ -83,7 +119,7 @@ publish         → 生成固定别名 + SHA256SUMS.txt + 创建 Release
 
 - **macOS**：本地开发用自签证书（`macos/make_cert.sh` 生成，TCC 麦克风授权不会每次重置）；CI 里退回 ad-hoc 签名。**没有 Apple 公证**，用户首次打开需要右键 → 打开。要正经分发需要 99 美元/年的开发者账号，加两行 `notarytool` 即可。
 - **Windows**：没有代码签名证书，SmartScreen 会提示「未知发布者」。EV 证书约 300-500 美元/年，拿到后把 `.pfx` 放进 Secrets，`electron-builder` 配 `win.certificateFile` 即可。
-- **Android**：现在用 debug 签名，能装能升级，但上架 Google Play 需要正式 keystore。生成方式见下。
+- **Android**：现在用 debug 签名（证书 DN 为 `CN=Android Debug`），能装能升级；但**更换签名后无法覆盖安装**，所以正式发版前应先固定一个 keystore。上架 Google Play 也需要正式签名。生成方式见下。
 
 ```bash
 # Android 正式签名（一次性）

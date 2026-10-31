@@ -85,9 +85,16 @@ class OverlayService : Service() {
         wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val view = WebView(this)
         Web.setup(view, this)
-        view.loadUrl("${Web.BASE}player.html?autostart=1")
 
-        val height = (resources.displayMetrics.density * 230).toInt()
+        // 与 App 内选的一致：特效/配色/高度都从同一份偏好里取，
+        // 否则用户在 App 里挑好的样式，悬浮层还画着默认值。
+        val bandDp = AndroidHost.height(this)
+        val q = "style=${AndroidHost.style(this)}&theme=${AndroidHost.theme(this)}" +
+                "&height=$bandDp&autostart=1"
+        view.loadUrl("${Web.BASE}player.html?$q")
+
+        // 窗口比光带高出一截，光晕才有地方画，否则满音量时顶部会被窗口裁掉
+        val height = (resources.displayMetrics.density * (bandDp + AndroidHost.HEADROOM_DP)).toInt()
         val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         else

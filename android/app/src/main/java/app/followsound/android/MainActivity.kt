@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -25,7 +26,12 @@ class MainActivity : AppCompatActivity() {
         web = findViewById(R.id.web)
         overlayBtn = findViewById(R.id.overlayBtn)
         Web.setup(web, this)
-        web.loadUrl("${Web.BASE}player.html?chrome=1")
+        // autostart=1：进 App 就直接接麦克风，不让用户先点一层「允许麦克风」的遮罩
+        val q = "chrome=1&autostart=1" +
+                "&style=${AndroidHost.style(this)}" +
+                "&theme=${AndroidHost.theme(this)}" +
+                "&height=${AndroidHost.height(this)}"
+        web.loadUrl("${Web.BASE}player.html?$q")
 
         findViewById<TextView>(R.id.ver).text = "v${BuildConfig.VERSION_NAME}"
         findViewById<View>(R.id.updateBtn).setOnClickListener { Updater.check(this, manual = true) }
@@ -44,11 +50,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun ensureMic() {
+        val ask = mutableListOf<String>()
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 1001)
+            ask += Manifest.permission.RECORD_AUDIO
         }
+        // Android 13+ 不申请的话，前台服务的通知会被静默丢掉，用户找不到「关闭悬浮窗」的入口
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ask += Manifest.permission.POST_NOTIFICATIONS
+        }
+        if (ask.isNotEmpty()) requestPermissions(ask.toTypedArray(), 1001)
     }
 
     private fun toggleOverlay() {

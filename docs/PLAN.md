@@ -13,7 +13,7 @@
 | 2 | 逐项修审查问题 | 14 项已修记录（见 REVIEW.md） | ✅ |
 | 3 | 图标重设计（白底透明） | `AppIcon.icns`、`StatusIcon(@2x).png`、`icon.ico`、Android mipmap、`favicon`/`og.png` | ✅ |
 | 4 | 统一更名「随响 FollowSound」 | 新 bundle id + 偏好迁移 + 全部文案/文件名 | ✅ |
-| 5 | 三端打包 | `FollowSound-macOS-1.0.0.zip`/`.dmg`、Windows `electron-builder` 配置、Android Gradle 工程 | ✅（mac 已出包；win/android 由 CI 出） |
+| 5 | 三端打包 | macOS `zip`/`dmg`、Windows `Setup.exe`/`zip`、Android `apk` | ✅ 三端实包均已产出并挂到 Release |
 | 6 | 三端自动更新 | mac `Updater.swift`、win `electron-updater`、android `Updater.kt` | ✅ |
 | 7 | 官网 | `docs/`（Pages 根目录）：功能 / 定价 / 下载 / 更新日志 / 实时演示 | ✅ |
 | 8 | 发布 | GitHub 仓库 + v1.0.0 Release + Pages 线上地址 | ✅ |
@@ -124,20 +124,34 @@ git init && git add -A && git commit -m "随响 FollowSound 1.0.0"
 git remote add origin https://github.com/VVCY/FollowSound.git
 git push -u origin main
 
-# 首个 Release：本地 mac 包 + 说明，win/android 交给标签触发 CI
-gh release create v1.0.0 dist/macos/* --notes-file docs/release-notes.md
+# 首个 Release：三端产物 + 说明 + 校验值 + 更新清单
+gh release create v1.0.0 \
+  dist/macos/FollowSound-macOS-1.0.0.zip dist/macos/FollowSound-macOS-1.0.0.dmg \
+  dist/windows/FollowSound-Windows-1.0.0-Setup.exe dist/windows/FollowSound-Windows-1.0.0-x64.zip \
+  dist/windows/latest.yml dist/android/FollowSound-Android-1.0.0.apk \
+  dist/macos/SHA256SUMS.txt \
+  --title "随响 FollowSound v1.0.0" --notes-file docs/release-notes.md
 ```
 
-之后每次发版只需要：改 `macos/VERSION` → 更新 `docs/release-notes.md` 与官网时间线 →
-`git tag v1.1.0 && git push origin v1.1.0`，CI 出三端包并挂到同一个 Release。
+再补上三个固定别名（官网按钮写死这几个名字，发新版不用改网页）：
+
+```bash
+for p in "macOS:dist/macos/FollowSound-macOS.zip" \
+         "Windows-Setup:dist/windows/FollowSound-Windows-Setup.exe" \
+         "Android:dist/android/FollowSound-Android.apk"; do
+  gh release upload v1.0.0 "${p#*:}" --clobber
+done
+```
+
+之后每次发版：改 `macos/VERSION` → 更新 `docs/release-notes.md` 与官网时间线 →
+重新出三端包 → `gh release create/upload`。标签触发 CI 的自动化路径也已就绪（`ci/release.yml`），
+启用后一条 `git push origin v1.1.0` 就能替代上面这段手工上传。
 
 **交付物**：仓库、Release、Pages 地址。**验收**：三个 `releases/latest/download/...` 链接都能下到文件。
 
 ## 还差什么（诚实清单）
 
-1. **Windows / Android 的包需要 CI 跑一次**：本机没有 Rust/Electron/Android 构建环境，
-   两个工程是完整可构建的源码 + 配置，产物由 `.github/workflows/release.yml` 出。
-2. **签名证书**：三端都没有正式签名（mac 无公证、win 无 EV 证书、android 用 debug 签名）。
+1. **签名证书**：三端都没有正式签名（mac 无公证、win 无 EV 证书、android 用 debug 签名）。
    能装能用，但都会有系统警告。要正经分发需要买证书，接入位置见 RELEASE.md。
-3. **GitHub Token 的 workflow 权限**：如果 CI 推送被拒（403 workflow scope），
+2. **GitHub Token 的 workflow 权限**：如果 CI 推送被拒（403 workflow scope），
    需要在 GitHub 上给 token 勾上 `workflow`，或直接在网页上添加这两个 yml。

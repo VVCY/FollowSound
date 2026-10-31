@@ -104,7 +104,8 @@ function createOverlay() {
   win.loadURL('app://local/player.html?' + q.toString());
   win.once('ready-to-show', () => win.showInactive());
 
-  if (isDev) win.webContents.openDevTools({ mode: 'detach' });
+  // 只有显式要求时才开调试面板，否则开发模式下每次启动都弹一个窗口
+  if (isDev && process.env.FS_DEVTOOLS === '1') win.webContents.openDevTools({ mode: 'detach' });
 }
 
 function applyHeight(h) {

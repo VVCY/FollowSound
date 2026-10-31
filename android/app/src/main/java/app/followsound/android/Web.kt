@@ -2,6 +2,7 @@ package app.followsound.android
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -31,6 +32,8 @@ object Web {
             allowContentAccess = false
         }
         view.setBackgroundColor(0x00000000)
+        // 页面里选了特效/配色/高度，顺手存一份给悬浮层用
+        view.addJavascriptInterface(AndroidHost(ctx), "FSHost")
 
         view.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(
