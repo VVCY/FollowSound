@@ -26,6 +26,13 @@ class OverlayService : Service() {
         var isRunning = false
         private const val CH_ID = "overlay"
         private const val NOTIF_ID = 42
+
+        /** 正在显示的悬浮层（没开时为 null）。App 内换了特效/配色要立刻推到这一层。 */
+        private var instance: OverlayService? = null
+
+        fun refresh() {
+            instance?.applyPrefs()
+        }
     }
 
     private var web: WebView? = null
@@ -36,9 +43,28 @@ class OverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
         isRunning = true
+        instance = this
         createChannel()
         startForeground(NOTIF_ID, buildNotification())
         showOverlay()
+    }
+
+    /**
+     * 把 App 里最新选的特效/配色推给已经在显示的悬浮层。
+     * 直接操作 window.fs 而不 reload：刷新一次会清空粒子、闪一下，
+     * 用户只是换个配色，不该让画面断一帧。
+     */
+    private fun applyPrefs() {
+        val v = web ?: return
+        val s = AndroidHost.style(this)
+        val t = AndroidHost.theme(this)
+        v.post {
+            v.evaluateJavascript(
+                "window.fsSetStyle&&fsSetStyle(\"$s\");" +
+                    "window.fsSetTheme&&fsSetTheme(\"$t\");",
+                null
+            )
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -123,6 +149,7 @@ class OverlayService : Service() {
 
     override fun onDestroy() {
         isRunning = false
+        if (instance === this) instance = null
         web?.let {
             try { wm.removeView(it) } catch (e: Exception) { /* 已移除 */ }
             it.destroy()

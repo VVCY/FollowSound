@@ -994,10 +994,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.setActivationPolicy(.accessory)
         // 改名换 bundle id：先把老用户的特效/配色/高度搬过来
         Prefs.migrateFromLegacyIfNeeded()
+        Prefs.applyDefaultsIfNeeded()   // 出厂默认改版时，旧的选择要让位一次
         DiagLog.shared.write("[launch] \(AppInfo.fullName) \(AppInfo.version) build \(AppInfo.build)")
 
-        style = Style(rawValue: UserDefaults.standard.string(forKey: "style") ?? "") ?? .band
-        theme = Theme.named(UserDefaults.standard.string(forKey: "theme") ?? "ocean")
+        style = Style(rawValue: UserDefaults.standard.string(forKey: "style") ?? "") ?? .rain
+        theme = Theme.named(UserDefaults.standard.string(forKey: "theme") ?? "crimson")
 
         // ---- 以下为 QA 专用：正式构建（不带 -D DEBUGTOOLS）整段不参与编译 ----
         #if DEBUGTOOLS

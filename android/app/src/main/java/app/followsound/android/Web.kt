@@ -36,7 +36,8 @@ object Web {
      *   App 级别的 RECORD_AUDIO 是另一层。缺这一层时就算 grant 了，流也是死的。
      */
     @SuppressLint("SetJavaScriptEnabled")
-    fun setup(view: WebView, ctx: Context, onNeedMic: (() -> Unit)? = null) {        val loader = WebViewAssetLoader.Builder()
+    fun setup(view: WebView, ctx: Context, onNeedMic: (() -> Unit)? = null) {
+        val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(ctx))
             .build()
 
@@ -51,6 +52,19 @@ object Web {
         // 页面里选了特效/配色/高度，顺手存一份给悬浮层用
         view.addJavascriptInterface(AndroidHost(ctx), "FSHost")
 
+        // 「页面已经能跑脚本了」这件事不能用单一回调赌：
+        // 在这台设备 + WebViewAssetLoader 的组合下，onPageFinished 和 onProgressChanged
+        // 都出现过一次都不回调的情况（上一版靠 onPageFinished 做麦克风重连，等于白写）。
+        // 这里挂两个回调，宿主侧再用 postDelayed 兜一层，见 MainActivity.loadPlayer()。
+        var readyDone = false
+        fun onReady(v: WebView?) {
+            if (readyDone || v == null) return
+            readyDone = true
+            if (hasMic(ctx)) {
+                v.evaluateJavascript("window.fsEnsureMic&&window.fsEnsureMic(1)", null)
+            }
+        }
+
         view.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(
                 v: WebView?,
@@ -59,8 +73,18 @@ object Web {
                 val url = request?.url ?: return null
                 return loader.shouldInterceptRequest(url)
             }
+
+            override fun onPageFinished(v: WebView?, url: String?) {
+                super.onPageFinished(v, url)
+                onReady(v)
+            }
         }
         view.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(v: WebView?, newProgress: Int) {
+                super.onProgressChanged(v, newProgress)
+                if (newProgress >= 100) onReady(v)
+            }
+
             override fun onPermissionRequest(request: PermissionRequest?) {
                 if (request == null) return
                 val audio = request.resources

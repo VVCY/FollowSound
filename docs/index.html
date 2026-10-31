@@ -23,11 +23,10 @@
     <span class="brand-text">随响 <b>FollowSound</b></span>
   </a>
   <nav class="nav-links">
-    <a href="#demo">先看一眼</a>
     <a href="#features">功能</a>
-    <a href="#themes">配色</a>
     <a href="#pricing">定价</a>
     <a href="#download">下载</a>
+    <a href="#changelog">更新日志</a>
     <a class="ghost" href="https://github.com/VVCY/FollowSound" target="_blank" rel="noopener">GitHub ↗</a>
   </nav>
 </header>
@@ -45,7 +44,7 @@
       </p>
       <div class="cta-row">
         <a class="btn primary" href="#download">下载 <span class="arrow">↓</span></a>
-        <a class="btn" href="#demo">先试 10 秒</a>
+        <button class="btn mic" id="heroMic">授予麦克风权限即可在网页端试用</button>
       </div>
       <ul class="hero-meta">
         <li>开源免费，没有订阅</li>
@@ -53,45 +52,12 @@
         <li>音频只在内存里过一遍</li>
       </ul>
     </div>
-
-    <div class="hero-stage">
-      <div class="stage-frame">
-        <canvas id="heroCanvas"></canvas>
-        <div class="stage-hint" id="heroHint">
-          <button id="heroMic" class="btn tiny">允许麦克风，试一下</button>
-          <span>没接麦克风也能看演示动画</span>
-        </div>
-        <div class="stage-tag" id="heroTag">光带 · 深海</div>
-      </div>
-      <div class="stage-picker" id="heroPicker"></div>
-    </div>
   </section>
 
-  <!-- ===== 01 演示 ===== -->
-  <section class="section" id="demo">
-    <div class="sec-head">
-      <span class="num">01</span>
-      <h2>按下去，<em>光就起来。</em></h2>
-      <p>七种特效，都是同一件事的不同说法：把 0 到 1 的音量，变成 0 到 180 像素的光。</p>
-    </div>
-
-    <div class="demo-block">
-      <div class="demo-canvas-wrap">
-        <canvas id="demoCanvas"></canvas>
-        <div class="demo-badge" id="demoLabel">光带</div>
-      </div>
-      <div class="demo-tabs" id="demoTabs"></div>
-      <p class="demo-note">
-        下面这块和 App 里跑的是同一份渲染代码（Canvas 版），桌面上是更细腻的图层版本。
-        点特效名字即时切换；接上麦克风，它会跟着你说话亮。
-      </p>
-    </div>
-  </section>
-
-  <!-- ===== 02 功能 ===== -->
+  <!-- ===== 01 功能 ===== -->
   <section class="section" id="features">
     <div class="sec-head">
-      <span class="num">02</span>
+      <span class="num">01</span>
       <h2>一个小工具，<em>只做一件事。</em></h2>
       <p>不做录音笔，不做会议记录，不做语音识别。它只管把音量画出来。</p>
     </div>
@@ -151,20 +117,10 @@
     </div>
   </section>
 
-  <!-- ===== 03 配色 ===== -->
-  <section class="section" id="themes">
-    <div class="sec-head">
-      <span class="num">03</span>
-      <h2>二十四套配色，<br><em>点一下换掉。</em></h2>
-      <p>主色决定光带的颜色，副色决定中段过渡与二段光。点下面的色块，上面的演示会立刻跟着换。</p>
-    </div>
-    <div class="swatches" id="swatches"></div>
-  </section>
-
-  <!-- ===== 04 定价 ===== -->
+  <!-- ===== 02 定价 ===== -->
   <section class="section" id="pricing">
     <div class="sec-head">
-      <span class="num">04</span>
+      <span class="num">02</span>
       <h2>免费。<em>就这样。</em></h2>
       <p>没有试用期、没有功能锁、没有订阅。它本来就是一个晚上写出来的小东西，
          如果它让你的会议好看了一点，可以请我喝杯咖啡——不给也一样能用全部功能。</p>
@@ -206,10 +162,10 @@
     </div>
   </section>
 
-  <!-- ===== 05 下载 ===== -->
+  <!-- ===== 03 下载 ===== -->
   <section class="section" id="download">
     <div class="sec-head">
-      <span class="num">05</span>
+      <span class="num">03</span>
       <h2>选你的设备，<em>三十秒装好。</em></h2>
       <p>所有安装包都发在同一个 GitHub Release 里，版本号一致。应用内可以直接检查更新。</p>
     </div>
@@ -265,10 +221,10 @@
     </div>
   </section>
 
-  <!-- ===== 06 更新日志 ===== -->
+  <!-- ===== 04 更新日志 ===== -->
   <section class="section" id="changelog">
     <div class="sec-head">
-      <span class="num">06</span>
+      <span class="num">04</span>
       <h2>更新日志</h2>
     </div>
     <ol class="timeline" id="timeline">
@@ -290,7 +246,7 @@
   <!-- ===== FAQ ===== -->
   <section class="section faq" id="faq">
     <div class="sec-head">
-      <span class="num">07</span>
+      <span class="num">05</span>
       <h2>几个问题</h2>
     </div>
     <div class="qa">
@@ -328,6 +284,68 @@
   </div>
   <div class="foot-note">© 2026 VVCY · 配色取自 JIZURA（MIT）· 本站不收集任何数据</div>
 </footer>
+
+<!-- ===== 底部演示坞：常驻视口底边，参照 App 的贴底光带 ===== -->
+<aside class="dock" id="dock" aria-label="随响实时演示">
+  <div class="dock-inner">
+
+    <div class="dock-bar">
+      <button class="switch" id="micSwitch" role="switch" aria-checked="false">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span>
+        <span>麦克风</span>
+      </button>
+      <div class="dock-picks">
+        <button class="dock-style-btn" id="dockStyleBtn" type="button" aria-label="选择特效" aria-expanded="false">特效</button>
+        <button class="dock-theme-btn" id="dockThemeBtn" type="button" aria-label="选择配色" aria-expanded="false">
+          <span class="tb-chip" id="tbChip" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p class="dock-status">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="dockText">授予麦克风权限即可在网页端试用</span>
+      </p>
+      <div class="dock-styles" id="dockStyles"></div>
+    </div>
+
+    <div class="dock-stage">
+      <canvas id="dockCanvas"></canvas>
+      <span class="dock-tag" id="dockTag">星雨 · 深红信号</span>
+      <button class="dock-toggle" id="dockToggle" type="button" aria-expanded="true" aria-label="收起演示控件">
+        <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+          <path d="M4 6.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="dock-swatches" id="swatches"></div>
+
+  </div>
+</aside>
+
+<!-- 配色面板：窄屏坞里放不下 24 套，按钮弹出全部列出 -->
+<div class="theme-sheet" id="themeSheet" hidden>
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="选择配色">
+    <div class="sheet-head">
+      <span class="sheet-title">配色</span>
+      <button class="sheet-close" id="sheetClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="sheet-grid" id="sheetGrid"></div>
+  </div>
+</div>
+
+<!-- 特效面板：窄屏坞里 7 个胶囊放不下，同样用按钮弹出 -->
+<div class="theme-sheet" id="styleSheet" hidden>
+  <div class="sheet-backdrop" id="styleBackdrop"></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="选择特效">
+    <div class="sheet-head">
+      <span class="sheet-title">特效</span>
+      <button class="sheet-close" id="styleClose" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="sheet-styles" id="styleList"></div>
+  </div>
+</div>
 
 <script src="assets/themes.js"></script>
 <script src="assets/visualizer.js"></script>

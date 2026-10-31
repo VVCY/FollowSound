@@ -20,19 +20,77 @@
   }
   .chrome.on { display: flex; flex-wrap: wrap; }
   .chrome label { opacity: .6; }
+  /* 统一成 Element 那套：细边框、小圆角、按下只把底色调亮一点，不用纯白 */
   .chrome select, .chrome button {
-    font: inherit; color: #e8ecf3; background: rgba(255,255,255,.09);
-    border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
-    padding: 6px 10px; outline: none;
+    font: inherit; color: #dfe5ee; background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.13); border-radius: 9px;
+    padding: 6px 12px; outline: none;
+    transition: background .12s ease, border-color .12s ease, color .12s ease;
   }
-  .chrome button.on { background: #fff; color: #0b0d12; border-color: #fff; }
+  .chrome button { font-weight: 500; letter-spacing: .02em; cursor: pointer; }
+  .chrome button:active { background: rgba(255,255,255,.15); }
+  .chrome button.on {
+    background: rgba(255,255,255,.10);
+    color: var(--fs-accent, #ff7d9c);
+    border-color: var(--fs-accent, #ff3d6e);
+  }
+
+  /* 自定义下拉：原生 <select> 的弹层由系统绘制（安卓上是灰白方框），
+     CSS 完全够不着，所以连触发器带菜单都自己画，才谈得上"Element 那种"观感。 */
+  .fs-select { position: relative; flex: 0 0 auto; min-width: 0; }
+  .fs-select-trigger {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    min-width: 132px; max-width: 100%;
+    font: inherit; color: #dfe5ee; background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.13); border-radius: 9px;
+    padding: 6px 10px 6px 12px; cursor: pointer; outline: none;
+    transition: background .12s ease, border-color .12s ease;
+  }
+  .fs-select-trigger:active { background: rgba(255,255,255,.15); }
+  .fs-select.open .fs-select-trigger {
+    border-color: var(--fs-accent, #ff3d6e);
+    background: rgba(255,255,255,.10);
+  }
+  .fs-select-label {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .fs-select-arrow {
+    flex: 0 0 auto; width: 0; height: 0; margin-top: 2px;
+    border-left: 4px solid transparent; border-right: 4px solid transparent;
+    border-top: 5px solid #8b95a7;
+    transition: transform .16s ease;
+  }
+  .fs-select.open .fs-select-arrow { transform: rotate(180deg); }
+  .fs-select-menu {
+    display: none; position: absolute;
+    left: 0; min-width: 100%; width: max-content; max-width: 76vw;
+    bottom: calc(100% + 6px);
+    padding: 6px; border-radius: 12px;
+    background: #171b23; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 14px 36px rgba(0,0,0,.55);
+    max-height: 46vh; overflow-y: auto; z-index: 30;
+  }
+  .fs-select.open .fs-select-menu { display: block; }
+  .fs-select-menu button {
+    display: block; width: 100%; text-align: left;
+    font: inherit; color: #cfd6e2; background: transparent;
+    border: 0; border-radius: 8px; padding: 8px 10px;
+    white-space: nowrap; cursor: pointer;
+  }
+  .fs-select-menu button:active { background: rgba(255,255,255,.10); }
+  .fs-select-menu button.on {
+    color: var(--fs-accent, #ff3d6e);
+    background: rgba(255,255,255,.07);
+    font-weight: 500;
+  }
   .chrome input[type=range] { width: 120px; accent-color: #fff; }
   .chrome .grow { flex: 1; }
   @media (max-width: 560px) {
     .chrome { gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
     .chrome label { display: none; }
     /* 两个下拉各占半行；滑块 + 数值 + 麦克风按钮占第二行 */
-    .chrome select { flex: 0 1 calc(50% - 4px); min-width: 0; }
+    .fs-select { flex: 0 1 calc(50% - 4px); }
+    .fs-select-trigger { min-width: 0; width: 100%; }
     .chrome input[type=range] { flex: 1 1 40%; width: auto; min-width: 80px; }
     #heightVal { flex: 0 0 auto; font-variant-numeric: tabular-nums; opacity: .7; }
     .chrome .grow { display: none; }
@@ -43,9 +101,12 @@
     background: rgba(8,10,14,.55); backdrop-filter: blur(2px); }
   .hint.hide { display: none; }
   .hint button {
-    font: inherit; color: #0b0d12; background: #fff; border: 0; border-radius: 999px;
-    padding: 10px 22px; margin-top: 14px; cursor: pointer;
+    font: inherit; font-weight: 500; color: #fff;
+    background: var(--fs-accent, #ff3d6e); border: 0; border-radius: 10px;
+    padding: 11px 24px; margin-top: 14px; cursor: pointer;
+    transition: filter .12s ease;
   }
+  .hint button:active { filter: brightness(.88); }
   .hint .box { text-align: center; max-width: 320px; padding: 24px; }
 
   /* 麦克风状态条：接不上时明说原因，别让画面继续假装在跟着声音动 */
@@ -61,10 +122,15 @@
   #micChip.on { display: inline-flex; }
   #micChip b { font-weight: 600; color: #ff8c9f; }
   #micChip button {
-    font: inherit; color: #0b0d12; background: #fff; border: 0; border-radius: 999px;
-    padding: 4px 10px;
+    font: inherit; font-weight: 500; color: #fff; cursor: pointer;
+    background: var(--fs-accent, #ff3d6e); border: 0; border-radius: 8px;
+    padding: 5px 11px; transition: filter .12s ease;
   }
-  #micChip button.ghost { background: rgba(255,255,255,.14); color: #e8ecf3; }
+  #micChip button:active { filter: brightness(.88); }
+  #micChip button.ghost {
+    background: transparent; color: #cfd6e2;
+    border: 1px solid rgba(255,255,255,.20); font-weight: 400;
+  }
 </style>
 </head>
 <body>
@@ -73,14 +139,14 @@
 
 <div class="chrome" id="chrome">
   <label>特效</label>
-  <select id="style"></select>
+  <div class="fs-select" id="stylePick"></div>
   <label>配色</label>
-  <select id="theme"></select>
+  <div class="fs-select" id="themePick"></div>
   <label>高度</label>
   <input type="range" id="height" min="80" max="400" step="1">
   <span id="heightVal">180</span>
   <span class="grow"></span>
-  <button id="micBtn">接麦克风</button>
+  <button id="micBtn">麦克风启用</button>
 </div>
 
 <div class="hint" id="hint">
@@ -114,50 +180,157 @@
   var bg = q.get('bg');
   if (bg) document.body.style.background = '#' + bg.replace('#', '');
 
+  // 出厂默认值（特效=星雨 / 配色=深红信号）改过之后，老用户存的旧选择会一直压在上面，
+  // 表现就是「默认值明明改了，打开还是老样子」。用一个版本号把旧选择作废一次：
+  // 只作废出厂默认这一层的覆盖，之后用户自己再选照样记住。
+  var PREFS_REV = 2;
+  (function migratePrefs() {
+    try {
+      if (localStorage.getItem('fs.prefRev') === String(PREFS_REV)) return;
+      localStorage.removeItem('fs.style');
+      localStorage.removeItem('fs.theme');
+      localStorage.setItem('fs.prefRev', String(PREFS_REV));
+    } catch (e) { /* 隐私模式：没有 localStorage 也不该白屏 */ }
+  })();
+
   var fs = FollowSound.create(stage, {
-    style: q.get('style') || localStorage.getItem('fs.style') || 'band',
-    theme: q.get('theme') || localStorage.getItem('fs.theme') || 'ocean',
+    style: q.get('style') || localStorage.getItem('fs.style') || 'rain',
+    theme: q.get('theme') || localStorage.getItem('fs.theme') || 'crimson',
     height: Number(q.get('height') || localStorage.getItem('fs.height') || 180),
     demo: isDemo
   });
   window.fs = fs;
   fs.start();
 
+  // 原生控件的强调色跟着主题走：样式里用 var(--fs-accent)，
+  // 不然换了配色，胶囊和按钮还停在深红那一套。
+  function syncAccent() {
+    var list = window.FS_THEMES || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].key === fs.themeKey) {
+        document.documentElement.style.setProperty('--fs-accent', list[i].accent);
+        return;
+      }
+    }
+  }
+  syncAccent();
+
   // ---- 控制条 ----
   var chrome = document.getElementById('chrome');
+  // 宿主（Windows 托盘 / Android）改样式时，这两个下拉也要跟着变，
+  // 否则页面上显示的还是旧名字 —— 「改了不生效」有一半是这种不同步。
+  var stylePicker = null, themePicker = null;
   if (q.get('chrome') === '1') {
     chrome.classList.add('on');
-    var selStyle = document.getElementById('style');
-    var selTheme = document.getElementById('theme');
-    FollowSound.STYLES.forEach(function (s) {
-      var o = document.createElement('option'); o.value = s.key; o.textContent = s.title;
-      selStyle.appendChild(o);
-    });
-    (window.FS_THEMES || []).forEach(function (t) {
-      var o = document.createElement('option'); o.value = t.key; o.textContent = t.name;
-      selTheme.appendChild(o);
-    });
-    selStyle.value = fs.style;
-    selTheme.value = fs.themeKey;
-    var range = document.getElementById('height');
-    var hv = document.getElementById('heightVal');
-    range.value = fs.getHeight(); hv.textContent = fs.getHeight();
 
     // 宿主桥：Android 端把选择存进 SharedPreferences，悬浮层启动时读同一份
     function remember(k, v) {
       try { if (window.FSHost) window.FSHost.set(k, String(v)); } catch (e) { /* 非 Android 环境 */ }
     }
 
-    selStyle.onchange = function () { fs.setStyle(this.value); localStorage.setItem('fs.style', this.value); remember('style', this.value); };
-    selTheme.onchange = function () { fs.setTheme(this.value); localStorage.setItem('fs.theme', this.value); remember('theme', this.value); };
+    // ---- 自定义下拉（Element 风格）----
+    // 同一时刻只允许一个展开；点页面别处收起。
+    var pickers = [];
+    function closeAll(except) {
+      pickers.forEach(function (p) { if (p.host !== except) p.close(); });
+    }
+    document.addEventListener('click', function () { closeAll(null); });
+
+    function createPicker(host, items, current, onChange) {
+      var trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'fs-select-trigger';
+      var label = document.createElement('span');
+      label.className = 'fs-select-label';
+      var arrow = document.createElement('i');
+      arrow.className = 'fs-select-arrow';
+      trigger.appendChild(label);
+      trigger.appendChild(arrow);
+      var menu = document.createElement('div');
+      menu.className = 'fs-select-menu';
+      host.appendChild(trigger);
+      host.appendChild(menu);
+
+      var api = {
+        host: host,
+        value: current,
+        onchange: onChange,
+        close: function () { host.classList.remove('open'); }
+      };
+
+      function titleOf(key) {
+        for (var i = 0; i < items.length; i++) if (items[i].key === key) return items[i].title;
+        return key;
+      }
+      function paint() {
+        label.textContent = titleOf(api.value);
+        menu.innerHTML = '';
+        items.forEach(function (it) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = it.title;
+          if (it.key === api.value) b.className = 'on';
+          b.onclick = function (e) {
+            e.stopPropagation();
+            api.value = it.key;
+            api.close();
+            paint();
+            if (typeof api.onchange === 'function') api.onchange(it.key);
+          };
+          menu.appendChild(b);
+        });
+      }
+      trigger.onclick = function (e) {
+        e.stopPropagation();
+        var willOpen = !host.classList.contains('open');
+        closeAll(host);
+        host.classList.toggle('open', willOpen);
+      };
+      api.set = function (v) { api.value = v; paint(); };
+      paint();
+      pickers.push(api);
+      return api;
+    }
+
+    stylePicker = createPicker(
+      document.getElementById('stylePick'),
+      FollowSound.STYLES.map(function (s) { return { key: s.key, title: s.title }; }),
+      fs.style,
+      function (k) {
+        fs.setStyle(k);
+        localStorage.setItem('fs.style', k);
+        remember('style', k);
+      }
+    );
+    themePicker = createPicker(
+      document.getElementById('themePick'),
+      (window.FS_THEMES || []).map(function (t) { return { key: t.key, title: t.name }; }),
+      fs.themeKey,
+      function (k) {
+        fs.setTheme(k);
+        syncAccent();
+        localStorage.setItem('fs.theme', k);
+        remember('theme', k);
+      }
+    );
+
+    var range = document.getElementById('height');
+    var hv = document.getElementById('heightVal');
+    range.value = fs.getHeight(); hv.textContent = fs.getHeight();
     range.oninput = function () { fs.setHeight(Number(this.value)); hv.textContent = this.value; remember('height', this.value); };
     range.onchange = function () { localStorage.setItem('fs.height', this.value); };
 
+    // 按钮文字跟着状态走：已连接时它是「关闭」而不是「再连一次」
     var micBtn = document.getElementById('micBtn');
-    micBtn.classList.toggle('on', fs.isMic());
+    window.fsSyncMicBtn = function () {
+      var on = fs.isMic();
+      micBtn.textContent = on ? '麦克风关闭' : '麦克风启用';
+      micBtn.classList.toggle('on', on);
+    };
+    window.fsSyncMicBtn();
     micBtn.onclick = function () {
-      if (fs.isMic()) { fs.detachMic(); micBtn.classList.remove('on'); }
-      else { connect().then(function (ok) { micBtn.classList.toggle('on', !!ok); }); }
+      if (fs.isMic()) { fs.detachMic(); window.fsSyncMicBtn(); }
+      else { connect().then(function () { window.fsSyncMicBtn(); }); }
     };
   }
 
@@ -181,8 +354,7 @@
       attaching = null;
       hint.classList.add('hide');
       chip.classList.remove('on');
-      var b = document.getElementById('micBtn');
-      if (b) b.classList.add('on');
+      if (window.fsSyncMicBtn) window.fsSyncMicBtn();
       // 打到宿主日志里：悬浮层/App 内没有控制台，出问题只能靠这一行
       console.log('mic ok: ' + JSON.stringify(window.fsMicInfo()));
       return true;
@@ -190,6 +362,7 @@
       attaching = null;
       hint.classList.add('hide');
       showChip((e && e.name) || (e && e.message) || 'Error');
+      if (window.fsSyncMicBtn) window.fsSyncMicBtn();
       return false;
     });
     return attaching;
@@ -207,6 +380,41 @@
   window.fsMicError = function (name) { hint.classList.add('hide'); showChip(name); };
   window.fsMicInfo = function () { return fs.micInfo ? fs.micInfo() : null; };
 
+  // 排障探针（只有 Android 宿主提供了 probe 时才跑）：
+  // WebView 里没有控制台，onConsoleMessage 在部分 ROM 上还收不到。
+  // 把「真实电平」和「渲染帧数」一起报上去，就能一句话分开两种故障：
+  //   帧数在涨、电平恒 0  → 采集侧死了（权限/被占用/路由）
+  //   帧数不动            → 渲染循环停了
+  if (window.FSHost && window.FSHost.probe) {
+    (function () {
+      var frames = 0, lastFrames = 0, lastT = 0, maxGap = 0;
+      (function tick(t) {
+        frames++;
+        if (lastT) {
+          var g = t - lastT;
+          if (g > maxGap) maxGap = g;
+        }
+        lastT = t;
+        requestAnimationFrame(tick);
+      })();
+      setInterval(function () {
+        try {
+          var info = fs.micInfo ? fs.micInfo() : null;
+          var d = frames - lastFrames;
+          lastFrames = frames;
+          // 「帧数够」不等于「顺」：掉一帧再补一帧，平均还是 60，但眼睛能看出来。
+          // 所以除了 fps 还报这一秒里最长的一次帧间隔（gap，毫秒）。
+          FSHost.probe(
+            (fs.level || 0).toFixed(3),
+            info && info.ok ? (info.state + '/' + info.trackState) : ((info && info.error) || 'none'),
+            d + 'fps gap' + maxGap.toFixed(1)
+          );
+          maxGap = 0;
+        } catch (e) { /* 桥不可用就算了 */ }
+      }, 1000);
+    })();
+  }
+
   if (isDemo) { hint.classList.add('hide'); fs.setDemo(true); }
   else {
     document.getElementById('grant').onclick = function () { connect(); };
@@ -214,10 +422,25 @@
     if (q.get('autostart') === '1' || location.protocol === 'file:') connect();
   }
 
-  // 供宿主（Electron 主进程 / Android）调用
-  window.fsSetStyle = function (k) { fs.setStyle(k); };
-  window.fsSetTheme = function (k) { fs.setTheme(k); };
-  window.fsSetHeight = function (h) { fs.setHeight(h); };
+  // 供宿主（Electron 主进程 / Android）调用。
+  // 只改画布是不够的：下拉的文字、选中态、按钮强调色都得一起走，
+  // 不然从托盘换来换去，页面上看着像"没接上"。
+  window.fsSetStyle = function (k) {
+    fs.setStyle(k);
+    if (stylePicker) stylePicker.set(k);
+  };
+  window.fsSetTheme = function (k) {
+    fs.setTheme(k);
+    if (themePicker) themePicker.set(k);
+    syncAccent();
+  };
+  window.fsSetHeight = function (h) {
+    fs.setHeight(h);
+    var r = document.getElementById('height');
+    var v = document.getElementById('heightVal');
+    if (r) r.value = fs.getHeight();
+    if (v) v.textContent = fs.getHeight();
+  };
   window.fsCloseHint = function () { hint.classList.add('hide'); };
 })();
 </script>

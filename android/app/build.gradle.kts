@@ -5,6 +5,14 @@ plugins {
 
 val fsVersionName = (project.findProperty("fsVersionName") as String?) ?: "1.0.0"
 val fsVersionCode = ((project.findProperty("fsVersionCode") as String?) ?: "1").toInt()
+// 更新检查接口。默认走 GitHub；本地联调时用 -PfsUpdateApi=http://127.0.0.1:8080/latest 覆盖，
+// 生产构建不传这个参数，产出的包与写死的地址完全一致。
+val fsUpdateApi = (project.findProperty("fsUpdateApi") as String?)
+    ?: "https://api.github.com/repos/VVCY/FollowSound/releases/latest"
+// 国内加速前缀（逗号分隔）。前缀 + 上面的接口地址 = 一个可用源，
+// 直连永远排在最后兜底。某个反代挂了不用发版：改这里重编即可，也可以随时增删。
+val fsUpdateMirrors = (project.findProperty("fsUpdateMirrors") as String?)
+    ?: "https://gh-proxy.com/"
 
 android {
     namespace = "app.followsound.android"
@@ -16,6 +24,8 @@ android {
         targetSdk = 35
         versionCode = fsVersionCode
         versionName = fsVersionName
+        buildConfigField("String", "UPDATE_API", "\"$fsUpdateApi\"")
+        buildConfigField("String", "UPDATE_MIRRORS", "\"$fsUpdateMirrors\"")
     }
 
     buildTypes {

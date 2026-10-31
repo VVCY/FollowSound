@@ -263,46 +263,88 @@
       }
     }
 
-    function drawRain(h, lv, dt) {
+    function drawRain(h, lv, dt, rise) {
       var p = stylePalette();
-      waterLine = H - (h + 10);
-      var rate = 26 + 90 * lv;
-      spawnAccum += rate * dt;
+      // 水位线 = 这一帧光带的顶边，从底边往上量（macOS 端同名变量叫 top）。
+      // 粒子只在「底边 → 水位线」这段里活动，所以整屏也是底部那一截在动，
+      // 不会像旧版那样从屏幕顶端一路下满屏 —— 那就是看着不如 mac 顺的原因。
+      var top = Math.min(h + 10, H - 4);
+      waterLine = H - top;
+      var gravity = 760;
+      // 恰好够到水位线所需的初速：雨点的劲头始终跟当前音量对得上，
+      // 否则音量一低、水面只剩十几 px，粒子按满音量速度冲上去会直接穿过水面。
+      var vTop = Math.sqrt(2 * gravity * Math.max(8, top));
+
+      // 鼓点一响，正在上冲的雨点整个被顶高一头 —— 节奏最直观的表现
+      if (rise > 0.12 && top > 8) {
+        for (var j = 0; j < particles.length; j++) {
+          if (!particles[j].bounced && particles[j].v < 0) {
+            particles[j].v -= 95 * Math.min(1.5, spike);
+          }
+        }
+      }
+
+      // 生成速率用 lv^0.7 而不是线性：小声说话时也有雨，不然轻声几乎什么都看不见
+      spawnAccum += Math.pow(Math.max(0, lv), 0.7) * 300 * dt;
       while (spawnAccum >= 1) {
         spawnAccum -= 1;
-        var lvl = Math.random();
-        particles.push({
-          x: Math.random() * W,
-          y: -10 - Math.random() * 30,
-          v: (0.36 + 0.62 * Math.random()) * (lvl > 0.62 ? 260 : 150),
-          r: 1.1 + Math.random() * 1.8,
-          bounced: false,
-          kick: 0.78 + Math.random() * 0.5,
-          bright: 0
-        });
+        if (particles.length < 220) {
+          // 分两拨：慢雨够不到水面，只铺在中下段；快雨一路冲到水面撞出回弹，
+          // 那一拨才是节奏的落点。
+          var slow = Math.random() < 0.38;
+          var k = slow ? (0.36 + 0.26 * Math.random()) : (0.78 + 0.34 * Math.random());
+          particles.push({
+            x: Math.random() * W,
+            y: H + 8,
+            v: -(vTop * k + Math.random() * 40),   // 负 = 向上冲
+            r: 1.5 + Math.random() * 1.9,
+            bounced: false,
+            kick: 0.78 + Math.random() * 0.5,
+            bright: 0
+          });
+        }
       }
+
       ctx.save();
       ctx.strokeStyle = rgba(p.accent, 0.45 + 0.55 * lv);
       ctx.fillStyle = rgba(p.accent, 0.85);
       ctx.lineCap = 'round';
+      var newborn = [];                 // 撞水面溅出的碎星，循环结束再并进去
       for (var i = particles.length - 1; i >= 0; i--) {
         var q = particles[i];
-        q.v += 760 * dt;
+        q.v += gravity * dt;
         q.bright = Math.max(0, q.bright - dt * 4.5);
         var ny = q.y + q.v * dt;
-        if (!q.bounced && q.v > 0 && ny >= waterLine) {
+        // 撞到水位线 → 回弹一次。弹起初速 = 撞上来的速度 × 弹性，
+        // 弹性跟音头走：没有音头只是轻轻退下，鼓点上会被整个弹回去。
+        if (!q.bounced && top > 4 && q.v < 0 && ny <= waterLine &&
+            particles.length + newborn.length < 320) {
           ny = waterLine;
           q.v = -q.v * (0.42 + 0.42 * Math.min(1, spike)) * q.kick;
           q.bounced = true;
           q.bright = 1;
+          // 顶到水面时溅两颗小碎星向下散开：回弹的「啪」就靠这一下被看见。
+          // 数量别多、位置要散，否则鼓点那一帧会挤成一团噪点。
+          for (var s = 0; s < 2; s++) {
+            newborn.push({
+              x: q.x + (Math.random() * 28 - 14),
+              y: waterLine + Math.random() * 5,
+              v: 100 + 140 * Math.random(),
+              r: 0.9 + Math.random() * 0.7,
+              bounced: true, kick: 1, bright: 0.5
+            });
+          }
         }
         q.y = ny;
-        if (q.y > H + 20) { particles.splice(i, 1); continue; }
+        if (q.y > H + 16) { particles.splice(i, 1); continue; }
+        // 尾巴在运动的反方向：冲得越快拉得越长，才像雨丝而不像噪点
         var tail = Math.min(26, Math.abs(q.v) * 0.055);
+        var tip = q.y - (q.v >= 0 ? tail : -tail);
+        if (tip < waterLine) tip = waterLine;   // 尾巴别越过水面，否则像穿帮
         ctx.lineWidth = Math.max(1, q.r * 0.9);
         ctx.beginPath();
-        ctx.moveTo(q.x, q.y);
-        ctx.lineTo(q.x, q.y - (q.v >= 0 ? tail : -tail));
+        ctx.moveTo(q.x, tip);
+        ctx.lineTo(q.x, q.y);
         ctx.stroke();
         var rr = q.r * (1 + q.bright * 1.1);
         ctx.beginPath();
@@ -310,9 +352,10 @@
         ctx.fill();
       }
       ctx.restore();
+      if (newborn.length) Array.prototype.push.apply(particles, newborn);
       if (particles.length > 400) particles.splice(0, particles.length - 400);
 
-      // 水位线
+      // 水位线：粒子撞上去回弹的那个平面，跟着音量上下走
       ctx.strokeStyle = rgba(p.accent, 0.30 + 0.38 * lv);
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -337,7 +380,7 @@
         case 'pixelSort': drawPixelSort(h, lv, dt); break;
         case 'equalizer': drawEqualizer(lv); break;
         case 'ripple': drawRipple(h); break;
-        case 'rain': drawRain(h, lv, dt); break;
+        case 'rain': drawRain(h, lv, dt, rise); break;
         default: drawBand(h);
       }
     }

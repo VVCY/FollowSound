@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  仅 debug 构建：允许明文 HTTP，方便用 adb reverse 把更新源指到本机，
+  在真机上验证下载进度条。release 不包含这份清单，生产包保持 https-only。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic" />
+</manifest>

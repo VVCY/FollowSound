@@ -14,31 +14,58 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="14dp">
 
-        <Button
-            android:id="@+id/overlayBtn"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/overlay_on" />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/updateBtn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="@string/check_update" />
+            <!--
+              用 TextView + 背景 selector，而不是原生 Button：
+              Button 在 AppCompat 主题下自带 backgroundTint、inset 和海拔阴影，
+              圆角会被裁、按下状态也压不住，怎么调都还是"系统设置"那一套观感。
+            -->
+            <TextView
+                android:id="@+id/overlayBtn"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:letterSpacing="0.02"
+                android:text="@string/overlay_on"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/updateBtn"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_ghost"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:letterSpacing="0.02"
+                android:text="@string/check_update"
+                android:textColor="#C6CEDA"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/ver"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textColor="#8A93A3"
-            android:textSize="12sp" />
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:textColor="#59616F"
+            android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

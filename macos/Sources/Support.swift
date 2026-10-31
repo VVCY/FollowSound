@@ -31,6 +31,30 @@ enum AppInfo {
 
     /// 发布资源命名约定，三端共用一套规则（见 docs/RELEASE.md）
     static func assetName(version: String) -> String { "FollowSound-macOS-\(version).zip" }
+
+    /// 国内可用的加速前缀。GitHub 直连在部分网络下完全不通，
+    /// 反代又是社区服务、随时可能关停 —— 所以它们只是候选，直连永远垫底兜底。
+    static let mirrors = ["https://gh-proxy.com/"]
+
+    /// 候选更新接口：上次成功的排第一，其余保持原序
+    static func releaseCandidates() -> [String] {
+        let direct = releasesAPI.absoluteString
+        let all = mirrors.map { $0 + direct } + [direct]
+        guard let last = UserDefaults.standard.string(forKey: "updateSource"),
+              all.contains(last) else { return all }
+        return [last] + all.filter { $0 != last }
+    }
+
+    /// 候选地址是「前缀 + 原地址」拼出来的，下载资源要沿用同一个前缀
+    static func prefix(of src: String) -> String {
+        let direct = releasesAPI.absoluteString
+        return src.hasSuffix(direct) ? String(src.dropLast(direct.count)) : ""
+    }
+
+    static func proxied(_ urlString: String?, prefix: String) -> URL? {
+        guard let urlString else { return nil }
+        return URL(string: prefix + urlString)
+    }
 }
 
 // ============ 偏好设置迁移 ============
@@ -50,6 +74,20 @@ enum Prefs {
             }
         }
         new.set(1, forKey: "prefsMigratedFrom")
+    }
+
+    /// 出厂默认值（特效=星雨 / 配色=深红信号）的版本号。
+    /// 改了默认值就 +1：老用户 UserDefaults 里存的旧选择作废一次，
+    /// 否则新默认永远被旧值压着 —— 现象就是「默认明明改了，打开还是老样子」。
+    /// 只清「样式」这一层，高度、门限这些用户调过的东西不动。
+    static let defaultsRev = 2
+
+    static func applyDefaultsIfNeeded() {
+        let d = UserDefaults.standard
+        guard d.integer(forKey: "prefsDefaultsRev") < defaultsRev else { return }
+        d.removeObject(forKey: "style")
+        d.removeObject(forKey: "theme")
+        d.set(defaultsRev, forKey: "prefsDefaultsRev")
     }
 }
 
@@ -186,28 +224,37 @@ final class Updater {
         busy = true
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: lastCheckKey)
         set(.checking)
+        attempt(AppInfo.releaseCandidates(), index: 0, silent: silent)
+    }
 
-        var req = URLRequest(url: AppInfo.releasesAPI)
-        req.timeoutInterval = 15
+    /// 按顺序试候选源：上次成功的排第一，然后镜像，直连垫底。
+    /// 镜像挂掉（403 / 502 / 超时）就换下一个；静默检查也一样换，只是最后才报错。
+    private func attempt(_ cands: [String], index: Int, silent: Bool) {
+        guard index < cands.count, let url = URL(string: cands[index]) else {
+            DispatchQueue.main.async {
+                self.busy = false
+                // 静默检查失败不打扰用户，直接回到 idle
+                self.set(silent ? .idle : .failed("连不上更新服务器，请检查网络后重试"))
+            }
+            return
+        }
+        let src = cands[index]
+
+        var req = URLRequest(url: url)
+        req.timeoutInterval = 8
         req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         req.setValue("FollowSound-macOS/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
 
         URLSession.shared.dataTask(with: req) { [weak self] data, resp, err in
             guard let self else { return }
-            func fail(_ msg: String) {
-                DispatchQueue.main.async {
-                    self.busy = false
-                    // 静默检查失败不打扰用户，直接回到 idle
-                    self.set(silent ? .idle : .failed(msg))
-                }
-            }
-            if let err { return fail(err.localizedDescription) }
-            guard let http = resp as? HTTPURLResponse else { return fail("网络无响应") }
-            guard http.statusCode == 200, let data else {
-                return fail(http.statusCode == 404 ? "还没有发布过版本" : "GitHub 返回 \(http.statusCode)")
-            }
+            func next() { self.attempt(cands, index: index + 1, silent: silent) }
+            if err != nil { return next() }
+            guard let http = resp as? HTTPURLResponse, http.statusCode == 200, let data else { return next() }
             guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let tag = obj["tag_name"] as? String else { return fail("版本信息解析失败") }
+                  let tag = obj["tag_name"] as? String else { return next() }
+            // 记住这个能用的源，下次直接问它
+            UserDefaults.standard.set(src, forKey: "updateSource")
+            let prefix = AppInfo.prefix(of: src)
 
             let ver = tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
             let notes = (obj["body"] as? String) ?? ""
@@ -222,7 +269,7 @@ final class Updater {
                 version: ver,
                 notes: notes,
                 pageURL: page,
-                assetURL: (picked?["browser_download_url"] as? String).flatMap(URL.init(string:)),
+                assetURL: AppInfo.proxied(picked?["browser_download_url"] as? String, prefix: prefix),
                 assetName: picked?["name"] as? String,
                 sizeBytes: (picked?["size"] as? Int) ?? 0
             )

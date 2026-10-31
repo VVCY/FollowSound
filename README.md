@@ -18,6 +18,10 @@
 
 官网：https://vvcy.github.io/FollowSound/
 
+> 打不开 GitHub 时，在任意直链前面加上 `https://gh-proxy.com/` 即可加速，例如
+> `https://gh-proxy.com/https://github.com/VVCY/FollowSound/releases/latest/download/FollowSound-Android.apk`。
+> 应用内的检查更新也会走这个源：三端都是「上次成功的源 → 镜像 → 直连」，谁快用谁。
+
 ## 仓库结构
 
 ```

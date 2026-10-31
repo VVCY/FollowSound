@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!--
+      关键：WebView 里的 getUserMedia 由 Chromium 的 cr_media 模块实现，
+      它在选择录音设备前会检查 MODIFY_AUDIO_SETTINGS，缺这条就只回：
+        W cr_media: Requires MODIFY_AUDIO_SETTINGS and RECORD_AUDIO. No audio device will be available
+      页面于是拿到 NotReadableError —— 表现就是「麦克风权限给了却一点声音都收不到」。
+      这是普通权限，安装即授予，不需要运行时申请。
+    -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

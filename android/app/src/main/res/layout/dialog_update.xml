@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  更新相关的弹窗（发现新版本 / 下载中 / 下载失败）共用一张卡片。
+  三种状态靠显示/隐藏来控制，而不是各画一份 —— 切换状态时不会闪，
+  也保证按钮、字体、间距在三处完全一致。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg"
+    android:orientation="vertical"
+    android:paddingHorizontal="22dp"
+    android:paddingTop="22dp"
+    android:paddingBottom="18dp">
+
+    <TextView
+        android:id="@+id/dTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#EDF1F7"
+        android:textSize="18sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.01" />
+
+    <TextView
+        android:id="@+id/dSub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="#8B95A7"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+    <!-- 版本说明：内容可能很长，限高后可滚 -->
+    <ScrollView
+        android:id="@+id/dScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:scrollbars="none">
+
+        <TextView
+            android:id="@+id/dBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#A6AEBD"
+            android:textSize="13sp"
+            android:lineSpacingExtra="4dp" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/dProgressBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/dBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/progress_bar" />
+
+        <TextView
+            android:id="@+id/dProgressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#8B95A7"
+            android:textSize="12sp"
+            android:fontFeatureSettings="tnum" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/dCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/btn_ghost"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="76dp"
+            android:paddingHorizontal="18dp"
+            android:text="稍后"
+            android:textColor="#C6CEDA"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/dOk"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/btn_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="96dp"
+            android:paddingHorizontal="18dp"
+            android:text="下载并安装"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

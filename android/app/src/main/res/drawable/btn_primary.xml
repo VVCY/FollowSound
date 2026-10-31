@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  主按钮：Element UI 的实心主色按钮。
+  深色界面里用「深红信号」的 accent 做填充，按下时压暗一档，
+  没有 elevation、没有内缩 inset —— 原生 Button 那种自带阴影+圆角的观感太"系统设置"了。
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#D92B58" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="#4A2531" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF3D6E" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+</selector>

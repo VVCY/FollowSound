@@ -1,15 +1,16 @@
 package app.followsound.android
 
 import android.Manifest
+import android.app.AppOpsManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Process
 import android.provider.Settings
 import android.view.View
 import android.webkit.WebView
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,12 +18,11 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
-    private lateinit var overlayBtn: Button
+    private lateinit var overlayBtn: TextView
 
     private var pageLoaded = false
     /** 用户点了悬浮窗、但麦克风还没授权：授权回来后自动把它开起来 */
-    private var pendingOverlay = false
-    /** 用户勾了「不再询问」/ 连续拒绝：再 requestPermissions 也不会弹窗，只能去系统设置 */
+    private var pendingOverlay = false    /** 用户勾了「不再询问」/ 连续拒绝：再 requestPermissions 也不会弹窗，只能去系统设置 */
     private var micBlocked = false
     private var asking = false
 
@@ -68,6 +68,14 @@ class MainActivity : AppCompatActivity() {
                 "&theme=${AndroidHost.theme(this)}" +
                 "&height=${AndroidHost.height(this)}"
         web.loadUrl("${Web.BASE}player.html?$q")
+
+        // WebView 的 onPageFinished / onProgressChanged 在这台设备上一次都没回调过，
+        // 光靠回调的话「授权后自动接麦」会彻底失效。给两个固定延迟兜底：
+        // connect() 内部有 attaching 去重，多喊几次不会开出第二条流。
+        if (Web.hasMic(this)) {
+            web.postDelayed({ if (!isFinishing) jsRetryMic() }, 800)
+            web.postDelayed({ if (!isFinishing) jsRetryMic() }, 2000)
+        }
     }
 
     private fun jsRetryMic() {
@@ -139,7 +147,7 @@ class MainActivity : AppCompatActivity() {
             overlayBtn.setText(R.string.overlay_on)
             return
         }
-        if (!Settings.canDrawOverlays(this)) {
+        if (!canDrawOverlay()) {
             // 悬浮层要「显示在其他应用上层」权限，只能跳到系统设置让用户手动开
             startActivity(
                 Intent(
@@ -156,6 +164,33 @@ class MainActivity : AppCompatActivity() {
             return
         }
         startOverlay()
+    }
+
+    /**
+     * 「显示在其他应用上层」到底给了没有。
+     *
+     * 小米（HyperOS）上实测：AppOps 已经是 allow，`Settings.canDrawOverlays()` 却仍返回 false，
+     * 于是用户明明在设置里打开了开关，回到 App 一点还是被弹回设置页 —— 看起来像死循环。
+     * 所以再直接查一次 AppOps，两边有一个放行就认为可以开。
+     */
+    private fun canDrawOverlay(): Boolean {
+        if (Settings.canDrawOverlays(this)) return true
+        return try {
+            val ops = getSystemService(AppOpsManager::class.java)
+            val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ops.unsafeCheckOpNoThrow(
+                    AppOpsManager.OPSTR_SYSTEM_ALERT_WINDOW, Process.myUid(), packageName
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                ops.checkOpNoThrow(
+                    AppOpsManager.OPSTR_SYSTEM_ALERT_WINDOW, Process.myUid(), packageName
+                )
+            }
+            mode == AppOpsManager.MODE_ALLOWED
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun startOverlay() {

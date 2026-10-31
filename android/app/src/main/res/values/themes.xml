@@ -7,4 +7,18 @@
         <item name="colorPrimary">#FFFFFF</item>
         <item name="colorAccent">#1FD2E6</item>
     </style>
+
+    <!--
+      更新弹窗：深色卡片浮在暗底上。
+      不要系统默认的对话框底板（浅色方角 + 系统内边距），
+      背景全透明，圆角和内边距都交给 dialog_update.xml 自己画。
+    -->
+    <style name="FollowSoundDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimAmount">0.62</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

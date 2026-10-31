@@ -20,13 +20,28 @@ const SETTINGS_PATH = () => path.join(app.getPath('userData'), 'settings.json');
 
 let win = null;
 let tray = null;
-let settings = { style: 'band', theme: 'ocean', height: 180, autoLaunch: false };
+// updateFeed 记上次能连上的更新源，见下方「自动更新」
+let settings = { style: 'rain', theme: 'crimson', height: 180, autoLaunch: false, updateFeed: '' };
 
 // ---------- 设置 ----------
+/**
+ * 出厂默认值（特效=星雨 / 配色=深红信号）的版本号。
+ * 改了默认值就 +1：老用户 settings.json 里存的旧选择作废一次，
+ * 否则新默认永远被旧值压着，看起来就是「改了不生效」。
+ * 只清样式这一层，高度和开机自启这些用户自己调过的不动。
+ */
+const DEFAULTS_REV = 2;
+
 function loadSettings() {
   try {
-    Object.assign(settings, JSON.parse(fs.readFileSync(SETTINGS_PATH(), 'utf8')));
+    const saved = JSON.parse(fs.readFileSync(SETTINGS_PATH(), 'utf8'));
+    Object.assign(settings, saved);
+    if (saved.rev !== DEFAULTS_REV) {
+      settings.style = 'rain';
+      settings.theme = 'crimson';
+    }
   } catch (e) { /* 首次运行没有文件，用默认值 */ }
+  settings.rev = DEFAULTS_REV;
 }
 function saveSettings() {
   try {
@@ -180,27 +195,86 @@ function rebuildTray() {
 }
 
 // ---------- 自动更新 ----------
+/**
+ * 更新源。electron-updater 的 generic 源只要求目录里有一份 latest.yml，
+ * 它会自己拼出安装包的下载地址 —— 正好能整个套在反代前缀后面，
+ * 查版本和下载走同一个前缀，不用改发布流程。
+ * 顺序：上次成功的 → 镜像 → 直连。反代是社区服务，挂了就往下换一个。
+ */
+const UPDATE_FEEDS = [
+  'https://gh-proxy.com/https://github.com/VVCY/FollowSound/releases/latest/download',
+  `https://github.com/${REPO.owner}/${REPO.repo}/releases/latest/download`
+];
+
+let feedOrder = [];        // 本次尝试顺序
+let feedIdx = 0;
+let updatePhase = 'idle';  // idle | check | download
+
+function orderedFeeds() {
+  const last = settings.updateFeed;
+  if (last && UPDATE_FEEDS.includes(last)) {
+    return [last].concat(UPDATE_FEEDS.filter((u) => u !== last));
+  }
+  return UPDATE_FEEDS.slice();
+}
+
+function useFeed(url) {
+  autoUpdater.setFeedURL({ provider: 'generic', url });
+}
+
 function checkForUpdates() {
   if (isDev) { updateState = '开发模式下不检查'; rebuildTray(); return; }
+  feedOrder = orderedFeeds();
+  feedIdx = 0;
+  updatePhase = 'check';
   updateState = '检查中…';
   rebuildTray();
+  useFeed(feedOrder[0]);
   autoUpdater.checkForUpdates().catch((e) => {
-    updateState = '检查失败';
-    rebuildTray();
     console.warn('update check failed:', e.message);
+    tryNextFeed(e);
   });
 }
 
+/** 当前源不行就换下一个；全都试完才报错 */
+function tryNextFeed(err) {
+  if (updatePhase !== 'check') { updateState = '更新出错'; rebuildTray(); return; }
+  feedIdx += 1;
+  if (feedIdx >= feedOrder.length) {
+    updatePhase = 'idle';
+    updateState = '检查失败';
+    rebuildTray();
+    console.warn('all update feeds failed:', err && err.message);
+    return;
+  }
+  useFeed(feedOrder[feedIdx]);
+  autoUpdater.checkForUpdates().catch((e) => tryNextFeed(e));
+}
+
+/** 记住能用的那个源，下次直接问它 */
+function rememberFeed() {
+  const ok = feedOrder[feedIdx];
+  if (ok && settings.updateFeed !== ok) {
+    settings.updateFeed = ok;
+    saveSettings();
+  }
+}
+
 autoUpdater.on('update-available', (info) => {
+  updatePhase = 'download';
+  rememberFeed();
   updateState = `发现 v${info.version}，正在下载`;
   rebuildTray();
   autoUpdater.downloadUpdate().catch(() => {});
 });
 autoUpdater.on('update-not-available', () => {
+  updatePhase = 'idle';
+  rememberFeed();
   updateState = '已是最新版本';
   rebuildTray();
 });
 autoUpdater.on('update-downloaded', (info) => {
+  updatePhase = 'idle';
   updateState = `v${info.version} 已就绪`;
   rebuildTray();
   new Notification({
@@ -208,7 +282,12 @@ autoUpdater.on('update-downloaded', (info) => {
     body: `新版本 v${info.version} 已下载，退出后自动安装。`
   }).show();
 });
-autoUpdater.on('error', () => { updateState = '更新出错'; rebuildTray(); });
+autoUpdater.on('error', (e) => {
+  if (updatePhase === 'check') return tryNextFeed(e);
+  updatePhase = 'idle';
+  updateState = '更新出错';
+  rebuildTray();
+});
 
 // ---------- 启动 ----------
 app.requestSingleInstanceLock() || app.quit();
