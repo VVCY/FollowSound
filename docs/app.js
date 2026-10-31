@@ -281,13 +281,35 @@
   if (active) sw.scrollLeft = active.offsetLeft - sw.clientWidth / 2 + active.offsetWidth / 2;
 
   // ---------- 版本号：优先读 GitHub，取不到就用页面上写死的 ----------
-  fetch('https://api.github.com/repos/VVCY/FollowSound/releases/latest', {
-    headers: { Accept: 'application/vnd.github+json' }
-  }).then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (j) {
-      if (!j || !j.tag_name) return;
-      var v = String(j.tag_name).replace(/^v/i, '');
-      document.getElementById('latestVer').textContent = 'v' + v;
-    })
-    .catch(function () { /* 离线或访问不了 GitHub 时保持默认值 */ });
+  // 国内直连 api.github.com 常常要挂到超时，这里给 3 秒闸门，超时就换镜像再试一次；
+  // 两次都不成，就保持 HTML 里写死的版本号，不做任何提示（不影响阅读）。
+  (function () {
+    var feeds = [
+      'https://api.github.com/repos/VVCY/FollowSound/releases/latest',
+      'https://gh-proxy.com/https://api.github.com/repos/VVCY/FollowSound/releases/latest'
+    ];
+    var el = document.getElementById('latestVer');
+    var CanAbort = typeof window.AbortController === 'function';
+
+    function attempt(i) {
+      if (i >= feeds.length) return;
+      var ctl = CanAbort ? new window.AbortController() : null;
+      var timer = ctl ? setTimeout(function () { ctl.abort(); }, 3000) : 0;
+      var opt = { headers: { Accept: 'application/vnd.github+json' } };
+      if (ctl) opt.signal = ctl.signal;
+
+      fetch(feeds[i], opt)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          clearTimeout(timer);
+          if (!j || !j.tag_name) return attempt(i + 1);
+          el.textContent = 'v' + String(j.tag_name).replace(/^v/i, '');
+        })
+        .catch(function () {
+          clearTimeout(timer);
+          attempt(i + 1);
+        });
+    }
+    attempt(0);
+  })();
 })();
