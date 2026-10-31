@@ -229,7 +229,10 @@ app.whenReady().then(() => {
   createOverlay();
 
   const iconPath = path.join(__dirname, '..', 'build', 'tray.png');
-  tray = new Tray(nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 }));
+  // 托盘图标是青色声波（非模板图）：Windows 不会自动反色，纯白透明图在浅色任务栏上会隐形。
+  const trayIcon = nativeImage.createFromPath(iconPath);
+  trayIcon.setTemplateImage(false);
+  tray = new Tray(trayIcon);
   tray.setToolTip(APP_NAME);
   rebuildTray();
 

@@ -70,6 +70,16 @@ cd android && ./gradlew assembleRelease \
 `app/build.gradle.kts` 里的 `syncShared` 会在 preBuild 前把 `../shared` 复制进 assets，
 所以 APK 里的渲染核心永远和仓库同源，不需要手工同步。
 
+### 平台差异（踩过的坑）
+
+- **托盘/菜单栏图标不是同一张图**：macOS 用模板图（白色透明）交给系统自动反色；
+  Windows 托盘不反色，纯白透明图在浅色任务栏上等于隐形、纯黑底又会在深色任务栏上糊掉。
+  所以 Windows 单独出一张 3 根青色声波柱的 `windows/build/tray.png`（16px 下 5 根会并成一团，3 根才认得出）。
+- **Android 的前台服务**：`specialUse` 类型必须同时声明 `FOREGROUND_SERVICE_SPECIAL_USE` 权限，
+  否则 `startForeground` 直接抛 `SecurityException`（Android 14+）。
+- **Android 的渲染核心**由 `syncShared` 在 `preBuild` 前复制进 assets，不进 git；
+  改了 `shared/` 一定要重新 `assembleRelease`，别只重启 App。
+
 ### 打包后核对（别省）
 
 ```bash

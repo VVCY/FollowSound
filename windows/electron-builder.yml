@@ -11,6 +11,7 @@ files:
   - package.json
   # 托盘图标要在包内，build/ 只作为 buildResources 不会自动打进去
   - build/tray.png
+  - build/tray@2x.png
   - "!**/*.map"
 
 # 视觉核心（themes.js / visualizer.js / player.html）随包带一份，运行时从 resources/shared 读
