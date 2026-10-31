@@ -213,7 +213,7 @@
 
     <div class="release-bar">
       <div>
-        <b>最新版本 <span id="latestVer">v1.0.1</span></b>
+        <b>最新版本 <span id="latestVer">v1.0.4</span></b>
         <span class="muted">· 全部资源见 </span>
         <a href="https://github.com/VVCY/FollowSound/releases" target="_blank" rel="noopener">GitHub Releases ↗</a>
       </div>
@@ -229,7 +229,15 @@
     </div>
     <ol class="timeline" id="timeline">
       <li>
-        <div class="t-ver">1.0.1 <span class="badge">当前</span></div>
+        <div class="t-ver">1.0.4 <span class="badge">当前</span></div>
+        <div class="t-date">2026-10-31 · macOS / Windows / Android</div>
+        <p>默认改成「星雨 + 深红信号」，并让旧的选择作废一次 —— 之前改了默认值，老用户看不到变化。
+           星雨换成 macOS 那套「从底边向上喷、撞水位线回弹」的物理，三端观感终于一致。
+           安卓控件换成 Element 风格（按钮、下拉、更新弹窗都是）。更新走国内镜像，下载有百分比和
+           MB 进度、可取消，装包前先校验完整，不再到系统安装器那儿报「解析软件包时出现问题」。</p>
+      </li>
+      <li>
+        <div class="t-ver">1.0.1</div>
         <div class="t-date">2026-10-31 · Android 优先</div>
         <p>修好安卓端「授权了麦克风却没反应」：现在先要系统权限、拿到后才接麦克风，接不上会直接写明原因
            （而不是默默放演示动画）。悬浮窗改为麦克风类型的前台服务，切到别的 App 上层继续收声。</p>
