@@ -1,0 +1,12 @@
+# Cloudflare Pages 项目配置（本地用 wrangler 部署时读这里）
+#
+#   npx wrangler pages deploy          # 走 pages_build_output_dir
+#   npx wrangler pages deploy docs     # 或显式指定目录
+#
+# 走控制台「Connect to Git」时这份文件不参与构建，那边的 Build command 留空、
+# Build output directory 填 docs，效果一样。两边改一处即可，别指望它同步。
+name = "followsound"
+pages_build_output_dir = "docs"
+compatibility_date = "2026-10-01"
+
+# 纯静态站，没有 Functions，所以不需要 pages_functions_dir

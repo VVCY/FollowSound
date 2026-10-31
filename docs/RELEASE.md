@@ -141,10 +141,61 @@ keytool -genkey -v -keystore followsound.jks -alias followsound \
 
 ## 6. 官网部署
 
-`docs/` 就是 GitHub Pages 的根目录，**不需要 Actions**：
+`docs/` 就是站点根目录，**不需要 Actions**。同一份文件同时发两个地方：GitHub Pages（主站）和
+Cloudflare Pages（国内备用入口）。
+
+### 6.1 GitHub Pages（主站）
 
 仓库 Settings → Pages → Source 选 `Deploy from a branch` → `main` / `/docs`。
 
 访问地址：https://vvcy.github.io/FollowSound/
 
 改完网页执行一次 `scripts/sync-web.sh` 把 `shared/` 同步到 `docs/assets/`，然后 commit 即上线。
+
+### 6.2 Cloudflare Pages（备用入口）
+
+目的只有一个：GitHub Pages 在国内经常慢或打不开。**Gitee Pages 已无解**（2024-05 下线，
+官方称暂不上线）；国内云厂商的静态托管要绑备案域名才有大陆节点，所以走 Cloudflare 这条免备案的路。
+
+两种接法，**二选一**：
+
+**A. 控制台连 Git（推荐，之后 push 自动部署）**
+
+Workers & Pages → Create → Pages → Connect to Git → 选 `VVCY/FollowSound`，然后：
+
+| 字段 | 填什么 |
+| --- | --- |
+| Project name | `followsound`（决定 `followsound.pages.dev`，被占用就换一个） |
+| Production branch | `main` |
+| Framework preset | `None` |
+| Build command | **留空** |
+| Build output directory | `docs` |
+| Root directory | 留空（仓库根） |
+
+**B. 本地 wrangler**
+
+```bash
+npx wrangler login          # 浏览器授权一次
+./scripts/deploy-cf.sh      # 先跑 sync-web --check，再部署 docs/
+```
+
+### 6.3 关于 `*.pages.dev` 的国内可达性（别抱太高期望）
+
+`pages.dev` 和 `workers.dev` 自 2022 年起在国内常遭 DNS 污染，**部分运营商/时段能通，属于"不稳定"
+而不是"完全不可用"**；移动网络最明显。想要稳定，必须绑**自己的域名**——不要求 ICP 备案，
+只要域名 DNS 能指向 Cloudflare：
+
+- 域名几十元/年，NS 托管到 Cloudflare（或子域 CNAME 到 `followsound.pages.dev`）；
+- 申请证书时若配过 CAA 记录，要放行 `letsencrypt.org`、`pki.goog`、`ssl.com`，否则证书激活不了；
+- 先在该 Pages 项目的 Custom domains 里添加域名，再去 DNS 加记录，顺序反了会 522。
+
+绑上自有域名后国内访问才谈得上稳定；只靠 `pages.dev`，它在国内的表现不一定比
+`vvcy.github.io` 好，这点要如实告诉用户。
+
+### 6.4 两份文件的用途
+
+| 文件 | 作用 | 备注 |
+| --- | --- | --- |
+| `docs/_headers` | Cloudflare Pages 的响应头（MIME 防嗅探、静态资源长缓存、HTML 回源校验） | Jekyll 忽略下划线开头文件，GitHub Pages 不会发布它，无副作用 |
+| `wrangler.toml` | `pages_build_output_dir = "docs"`，供本地 wrangler 与 CLI 部署 | 走控制台连 Git 时这份文件不参与构建 |
+

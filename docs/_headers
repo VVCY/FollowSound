@@ -1,0 +1,25 @@
+# Cloudflare Pages 专用（GitHub Pages 用 Jekyll，会忽略下划线开头的文件，不会误发）
+#
+# 只做三件事：别让浏览器猜 MIME、给静态资源长缓存、HTML 每次都回源校验。
+# 没有 CSP：页面里用了内联脚本与 canvas，收紧 CSP 需要先拆内联，等有需要再说。
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: microphone=(self)
+
+/assets/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/*.css
+  Cache-Control: public, max-age=3600
+
+/*.js
+  Cache-Control: public, max-age=3600
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
