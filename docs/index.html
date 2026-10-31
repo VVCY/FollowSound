@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>随响 FollowSound —— 说话时，屏幕底部会有光</title>
+<meta name="description" content="随响 FollowSound 是一款免费的声音可视化小工具：把麦克风里的音量变成屏幕底边的一条光带。7 种特效、24 套配色、高度无级调节，macOS / Windows / Android 三端一致。不录音、不上传。">
+<meta property="og:title" content="随响 FollowSound">
+<meta property="og:description" content="把说话的音量变成屏幕底边的一条光带。免费、三端、不录音。">
+<meta property="og:image" content="assets/og.png">
+<meta name="theme-color" content="#08090C">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/icon-256.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top">
+    <span class="brand-mark" aria-hidden="true">
+      <i style="--h:.26"></i><i style="--h:.54"></i><i style="--h:.82"></i><i style="--h:1"></i><i style="--h:.76"></i><i style="--h:.48"></i><i style="--h:.28"></i>
+    </span>
+    <span class="brand-text">随响 <b>FollowSound</b></span>
+  </a>
+  <nav class="nav-links">
+    <a href="#demo">先看一眼</a>
+    <a href="#features">功能</a>
+    <a href="#themes">配色</a>
+    <a href="#pricing">定价</a>
+    <a href="#download">下载</a>
+    <a class="ghost" href="https://github.com/VVCY/FollowSound" target="_blank" rel="noopener">GitHub ↗</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="dot"></span> 免费 · macOS / Windows / Android</div>
+      <h1>说话的时候，<br><em>屏幕底部会有光。</em></h1>
+      <p class="lede">
+        随响是一款声音可视化小工具。它只读音量，不认字：开会、录播客、语音输入，
+        你开口的那一刻，屏幕底边会升起一条跟着音量和节奏起伏的光带。
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="#download">下载 <span class="arrow">↓</span></a>
+        <a class="btn" href="#demo">先试 10 秒</a>
+      </div>
+      <ul class="hero-meta">
+        <li>开源免费，没有订阅</li>
+        <li>无需账号</li>
+        <li>音频只在内存里过一遍</li>
+      </ul>
+    </div>
+
+    <div class="hero-stage">
+      <div class="stage-frame">
+        <canvas id="heroCanvas"></canvas>
+        <div class="stage-hint" id="heroHint">
+          <button id="heroMic" class="btn tiny">允许麦克风，试一下</button>
+          <span>没接麦克风也能看演示动画</span>
+        </div>
+        <div class="stage-tag" id="heroTag">光带 · 深海</div>
+      </div>
+      <div class="stage-picker" id="heroPicker"></div>
+    </div>
+  </section>
+
+  <!-- ===== 01 演示 ===== -->
+  <section class="section" id="demo">
+    <div class="sec-head">
+      <span class="num">01</span>
+      <h2>按下去，<em>光就起来。</em></h2>
+      <p>七种特效，都是同一件事的不同说法：把 0 到 1 的音量，变成 0 到 180 像素的光。</p>
+    </div>
+
+    <div class="demo-block">
+      <div class="demo-canvas-wrap">
+        <canvas id="demoCanvas"></canvas>
+        <div class="demo-badge" id="demoLabel">光带</div>
+      </div>
+      <div class="demo-tabs" id="demoTabs"></div>
+      <p class="demo-note">
+        下面这块和 App 里跑的是同一份渲染代码（Canvas 版），桌面上是更细腻的图层版本。
+        点特效名字即时切换；接上麦克风，它会跟着你说话亮。
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== 02 功能 ===== -->
+  <section class="section" id="features">
+    <div class="sec-head">
+      <span class="num">02</span>
+      <h2>一个小工具，<em>只做一件事。</em></h2>
+      <p>不做录音笔，不做会议记录，不做语音识别。它只管把音量画出来。</p>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature wide">
+        <div class="f-copy">
+          <span class="f-tag">隐私</span>
+          <h3>只读音量，<br>不知道你说了什么</h3>
+          <p>音频在内存里算一次均方根就丢掉，不落盘、不联网、不识别内容。麦克风权限只为读音量存在，
+             关掉 App 就释放设备。</p>
+        </div>
+        <div class="f-vis">
+          <div class="meter"><span></span></div>
+          <div class="f-vis-label">RMS → dB → 0…1</div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="f-tag">特效</span>
+        <h3>7 种特效，<br>24 套配色</h3>
+        <p>光带、色差光带、横向镜头光斑、像素拉丝、均衡器、波纹、星雨。配色取自 JIZURA 的 24 个 style pack。</p>
+      </article>
+
+      <article class="feature">
+        <span class="f-tag">高度</span>
+        <h3>无级调节，<br>拖到哪就是哪</h3>
+        <p>80–400 pt 之间任意拖。拖动时画面直接顶到满高，不用猜“调到 220 会有多高”。</p>
+        <div class="slider-mock"><span></span></div>
+      </article>
+
+      <article class="feature">
+        <span class="f-tag">不打扰</span>
+        <h3>贴着屏幕底边，<br>不挡点击</h3>
+        <p>覆盖层永远不接收鼠标事件。它在所有空间都在，全屏演示时也在，但你可以直接点穿它。</p>
+      </article>
+
+      <article class="feature">
+        <span class="f-tag">省电</span>
+        <h3>安静时几乎不耗电</h3>
+        <p>静音超过半秒自动降到 15fps，一有声音立刻回到 60fps。空闲时 CPU 占用通常低于 1%。</p>
+      </article>
+
+      <article class="feature wide">
+        <div class="f-copy">
+          <span class="f-tag">三端</span>
+          <h3>同一个观感，<br>换台机器不用重新学</h3>
+          <p>macOS 是原生 Swift + Core Animation；Windows 与 Android 用同一份 Canvas 渲染核心。
+             特效名字、配色名字、高度滑块位置都一样。</p>
+        </div>
+        <div class="f-vis platform">
+          <div><b>macOS</b><span>14+ · 通用二进制</span></div>
+          <div><b>Windows</b><span>10 / 11 · 64 位</span></div>
+          <div><b>Android</b><span>8.0+ · 悬浮窗</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== 03 配色 ===== -->
+  <section class="section" id="themes">
+    <div class="sec-head">
+      <span class="num">03</span>
+      <h2>二十四套配色，<br><em>点一下换掉。</em></h2>
+      <p>主色决定光带的颜色，副色决定中段过渡与二段光。点下面的色块，上面的演示会立刻跟着换。</p>
+    </div>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <!-- ===== 04 定价 ===== -->
+  <section class="section" id="pricing">
+    <div class="sec-head">
+      <span class="num">04</span>
+      <h2>免费。<em>就这样。</em></h2>
+      <p>没有试用期、没有功能锁、没有订阅。它本来就是一个晚上写出来的小东西，
+         如果它让你的会议好看了一点，可以请我喝杯咖啡——不给也一样能用全部功能。</p>
+    </div>
+
+    <div class="price-grid">
+      <div class="price-card free">
+        <div class="price-head">
+          <h3>免费版</h3>
+          <div class="price"><span class="cur">¥</span>0<span class="per">/ 永久</span></div>
+          <p class="price-sub">下载即用，三端一致</p>
+        </div>
+        <ul class="price-list">
+          <li>7 种特效，24 套配色</li>
+          <li>高度 80–400 pt 无级调节</li>
+          <li>实时悬浮预览，不挡点击</li>
+          <li>macOS / Windows / Android</li>
+          <li>应用内检查更新（走 GitHub）</li>
+          <li>不录音、不上传、无需账号</li>
+        </ul>
+        <a class="btn primary full" href="#download">免费下载</a>
+      </div>
+
+      <div class="price-card support">
+        <div class="price-head">
+          <h3>支持作者</h3>
+          <div class="price"><span class="cur">¥</span>随意<span class="per">/ 一次性</span></div>
+          <p class="price-sub">不买功能，只买“继续做下去”</p>
+        </div>
+        <ul class="price-list">
+          <li>不解锁任何东西——本来就没有锁</li>
+          <li>钱会花在下一次大版本上</li>
+          <li>也可以只做一件事：去 GitHub 点个 Star</li>
+          <li>提 issue 告诉我你想要的第 8 种特效</li>
+        </ul>
+        <a class="btn full" href="https://github.com/VVCY/FollowSound" target="_blank" rel="noopener">去 GitHub 看看 ↗</a>
+        <p class="tiny-note">暂时没有收款入口。等真的有人愿意付，再开。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05 下载 ===== -->
+  <section class="section" id="download">
+    <div class="sec-head">
+      <span class="num">05</span>
+      <h2>选你的设备，<em>三十秒装好。</em></h2>
+      <p>所有安装包都发在同一个 GitHub Release 里，版本号一致。应用内可以直接检查更新。</p>
+    </div>
+
+    <div class="dl-grid">
+      <div class="dl-card">
+        <div class="dl-os">macOS</div>
+        <h3>随响 for Mac</h3>
+        <p class="dl-meta">macOS 14 Sonoma 及以上 · Apple 芯片与 Intel 通用 · 约 1 MB</p>
+        <ul>
+          <li>菜单栏常驻，不占 Dock</li>
+          <li>悬浮层贴屏幕底边</li>
+          <li>原生 Core Animation 渲染</li>
+        </ul>
+        <a class="btn primary full" href="https://github.com/VVCY/FollowSound/releases/latest/download/FollowSound-macOS.zip">下载 .zip</a>
+        <p class="tiny-note">首次打开若被 Gatekeeper 拦下：右键 → 打开。</p>
+      </div>
+
+      <div class="dl-card">
+        <div class="dl-os">Windows</div>
+        <h3>随响 for Windows</h3>
+        <p class="dl-meta">Windows 10 / 11 · 64 位 · 约 80 MB</p>
+        <ul>
+          <li>托盘常驻，透明覆盖层</li>
+          <li>点击穿透，不挡操作</li>
+          <li>自动更新（electron-updater）</li>
+        </ul>
+        <a class="btn primary full" href="https://github.com/VVCY/FollowSound/releases/latest/download/FollowSound-Windows-Setup.exe">下载安装包</a>
+        <p class="tiny-note">未做代码签名，SmartScreen 提示时选“仍要运行”。</p>
+      </div>
+
+      <div class="dl-card">
+        <div class="dl-os">Android</div>
+        <h3>随响 for Android</h3>
+        <p class="dl-meta">Android 8.0 及以上 · 约 3 MB</p>
+        <ul>
+          <li>悬浮窗光带，盖在任何 App 上</li>
+          <li>也可全屏当现场背景</li>
+          <li>应用内直接下 APK 更新</li>
+        </ul>
+        <a class="btn primary full" href="https://github.com/VVCY/FollowSound/releases/latest/download/FollowSound-Android.apk">下载 .apk</a>
+        <p class="tiny-note">需要手动允许“显示在其他应用上层”。</p>
+      </div>
+    </div>
+
+    <div class="release-bar">
+      <div>
+        <b>最新版本 <span id="latestVer">v1.0.0</span></b>
+        <span class="muted">· 全部资源见 </span>
+        <a href="https://github.com/VVCY/FollowSound/releases" target="_blank" rel="noopener">GitHub Releases ↗</a>
+      </div>
+      <div class="muted">校验值（SHA-256）随每个 Release 附在说明里</div>
+    </div>
+  </section>
+
+  <!-- ===== 06 更新日志 ===== -->
+  <section class="section" id="changelog">
+    <div class="sec-head">
+      <span class="num">06</span>
+      <h2>更新日志</h2>
+    </div>
+    <ol class="timeline" id="timeline">
+      <li>
+        <div class="t-ver">1.0.0 <span class="badge">当前</span></div>
+        <div class="t-date">2026-10-31 · macOS / Windows / Android</div>
+        <p>首个公开版本：7 种特效、24 套配色、高度无级调节、三端一致的观感。改名「随响 FollowSound」，
+           换成白底透明的声波图标，接上 GitHub 自动更新。</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="section faq" id="faq">
+    <div class="sec-head">
+      <span class="num">07</span>
+      <h2>几个问题</h2>
+    </div>
+    <div class="qa">
+      <details open>
+        <summary>它真的不录音吗？</summary>
+        <p>不录。音频缓冲区只用来算一个均方根（音量），算完就丢。代码是开源的，可以自己看。</p>
+      </details>
+      <details>
+        <summary>为什么 macOS 版打开时提示“无法验证开发者”？</summary>
+        <p>没有走 Apple 公证（要 99 美元一年）。右键点图标 → 打开，之后就不会再问。</p>
+      </details>
+      <details>
+        <summary>会挡到我点东西吗？</summary>
+        <p>不会。覆盖层设置了点击穿透，鼠标事件直接落到下面的窗口。</p>
+      </details>
+      <details>
+        <summary>以后会收费吗？</summary>
+        <p>当前没有付费计划。如果哪天要做更重的东西（比如多轨、录制），会另开一个产品，不锁现有功能。</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-brand">
+    <span class="brand-mark small" aria-hidden="true">
+      <i style="--h:.26"></i><i style="--h:.54"></i><i style="--h:.82"></i><i style="--h:1"></i><i style="--h:.76"></i><i style="--h:.48"></i><i style="--h:.28"></i>
+    </span>
+    <span>随响 FollowSound</span>
+  </div>
+  <div class="foot-links">
+    <a href="https://github.com/VVCY/FollowSound" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/VVCY/FollowSound/releases" target="_blank" rel="noopener">Releases</a>
+    <a href="https://github.com/VVCY/FollowSound/issues" target="_blank" rel="noopener">反馈</a>
+  </div>
+  <div class="foot-note">© 2026 VVCY · 配色取自 JIZURA（MIT）· 本站不收集任何数据</div>
+</footer>
+
+<script src="assets/themes.js"></script>
+<script src="assets/visualizer.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

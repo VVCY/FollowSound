@@ -1,0 +1,1074 @@
+[
+ {
+  "key": "noir",
+  "name": "ノワール・クロマ",
+  "grain": 0.9,
+  "ghost": 1.0,
+  "schemes": [
+   {
+    "bg": "#060607",
+    "fg": "#F5EEEA",
+    "sub": "#BDB6B2",
+    "accent": "#F5A50C",
+    "accent2": "#16F4D4",
+    "ink": "#F5EEEA",
+    "dim": "#2A2A2E",
+    "ghostA": "#F5A50C",
+    "ghostB": "#16F4D4"
+   },
+   {
+    "bg": "#F2EDE8",
+    "fg": "#0B0B0C",
+    "sub": "#4A4644",
+    "accent": "#E0600C",
+    "accent2": "#0FAE98",
+    "ink": "#0B0B0C",
+    "dim": "#D9D2CC",
+    "ghostA": "#F5A50C",
+    "ghostB": "#16C4B4"
+   }
+  ]
+ },
+ {
+  "key": "crimson",
+  "name": "クリムゾン・シグナル",
+  "grain": 0.6,
+  "ghost": 0.8,
+  "schemes": [
+   {
+    "bg": "#C8103F",
+    "fg": "#FFFFFF",
+    "sub": "#FFD9E2",
+    "accent": "#140509",
+    "accent2": "#39F2C8",
+    "ink": "#140509",
+    "dim": "#B00D37",
+    "ghostA": "#FFFFFF",
+    "ghostB": "#39F2C8"
+   },
+   {
+    "bg": "#FF6F98",
+    "fg": "#FFFFFF",
+    "sub": "#FFE3EB",
+    "accent": "#1A0710",
+    "accent2": "#39F2C8",
+    "ink": "#1A0710",
+    "dim": "#F25C87",
+    "ghostA": "#FFFFFF",
+    "ghostB": "#1A0710"
+   },
+   {
+    "bg": "#150509",
+    "fg": "#FF3D6E",
+    "sub": "#FF9DB6",
+    "accent": "#FFFFFF",
+    "accent2": "#39F2C8",
+    "ink": "#FF3D6E",
+    "dim": "#2A0B14",
+    "ghostA": "#FF3D6E",
+    "ghostB": "#39F2C8"
+   }
+  ]
+ },
+ {
+  "key": "caution",
+  "name": "コーション",
+  "grain": 0.5,
+  "ghost": 0.55,
+  "schemes": [
+   {
+    "bg": "#F4D21F",
+    "fg": "#141414",
+    "sub": "#3A3510",
+    "accent": "#E0231C",
+    "accent2": "#1F3FD8",
+    "ink": "#141414",
+    "dim": "#E6C413",
+    "ghostA": "#E0231C",
+    "ghostB": "#1F3FD8"
+   },
+   {
+    "bg": "#E0231C",
+    "fg": "#F4D21F",
+    "sub": "#FFE9A0",
+    "accent": "#141414",
+    "accent2": "#FFFFFF",
+    "ink": "#141414",
+    "dim": "#C81E17",
+    "ghostA": "#141414",
+    "ghostB": "#F4D21F"
+   },
+   {
+    "bg": "#18181A",
+    "fg": "#F4D21F",
+    "sub": "#DDD6B0",
+    "accent": "#E0231C",
+    "accent2": "#FFFFFF",
+    "ink": "#F4D21F",
+    "dim": "#26262A",
+    "ghostA": "#E0231C",
+    "ghostB": "#1F3FD8"
+   }
+  ]
+ },
+ {
+  "key": "magenta",
+  "name": "ポップ・マゼンタ",
+  "grain": 0.3,
+  "ghost": 0.35,
+  "schemes": [
+   {
+    "bg": "#FF0A8C",
+    "fg": "#FFFFFF",
+    "sub": "#FFD2EA",
+    "accent": "#FFFFFF",
+    "accent2": "#2B2BD9",
+    "ink": "#FFFFFF",
+    "dim": "#F0077F",
+    "ghostA": "#FF8CC8",
+    "ghostB": "#2B2BD9"
+   },
+   {
+    "bg": "#FFFFFF",
+    "fg": "#FF0A8C",
+    "sub": "#FF6DB6",
+    "accent": "#2B2BD9",
+    "accent2": "#FF0A8C",
+    "ink": "#FF0A8C",
+    "dim": "#FFE4F2",
+    "ghostA": "#2B2BD9",
+    "ghostB": "#FF8CC8"
+   },
+   {
+    "bg": "#2B2BD9",
+    "fg": "#FFFFFF",
+    "sub": "#C9C9FF",
+    "accent": "#FF0A8C",
+    "accent2": "#FFFFFF",
+    "ink": "#FFFFFF",
+    "dim": "#2424C4",
+    "ghostA": "#FF0A8C",
+    "ghostB": "#FFFFFF"
+   }
+  ]
+ },
+ {
+  "key": "paper",
+  "name": "ペーパー・インク",
+  "grain": 0.7,
+  "ghost": 0.5,
+  "schemes": [
+   {
+    "bg": "#ECE9E3",
+    "fg": "#1B2350",
+    "sub": "#4D5270",
+    "accent": "#C2185B",
+    "accent2": "#111111",
+    "ink": "#111111",
+    "dim": "#DAD6CE",
+    "ghostA": "#C2185B",
+    "ghostB": "#1B2350"
+   },
+   {
+    "bg": "#151515",
+    "fg": "#F0EDE7",
+    "sub": "#B8B4AC",
+    "accent": "#C2185B",
+    "accent2": "#1B2350",
+    "ink": "#F0EDE7",
+    "dim": "#232323",
+    "ghostA": "#C2185B",
+    "ghostB": "#3A4690"
+   },
+   {
+    "bg": "#C2185B",
+    "fg": "#FFFFFF",
+    "sub": "#F6C6D8",
+    "accent": "#1B2350",
+    "accent2": "#111111",
+    "ink": "#1B2350",
+    "dim": "#B5154F",
+    "ghostA": "#1B2350",
+    "ghostB": "#FFFFFF"
+   },
+   {
+    "bg": "#1B2350",
+    "fg": "#F0EDE7",
+    "sub": "#AEB2CC",
+    "accent": "#C2185B",
+    "accent2": "#FFFFFF",
+    "ink": "#F0EDE7",
+    "dim": "#1F2858",
+    "ghostA": "#C2185B",
+    "ghostB": "#FFFFFF"
+   }
+  ]
+ },
+ {
+  "key": "hud",
+  "name": "ダークHUD",
+  "grain": 1.0,
+  "ghost": 0.6,
+  "schemes": [
+   {
+    "bg": "#131315",
+    "fg": "#EFEDEA",
+    "sub": "#8E8B88",
+    "accent": "#F25A2B",
+    "accent2": "#FFFFFF",
+    "ink": "#EFEDEA",
+    "dim": "#1E1E21",
+    "ghostA": "#F25A2B",
+    "ghostB": "#7FD7FF"
+   },
+   {
+    "bg": "#0B0B0C",
+    "fg": "#FFFFFF",
+    "sub": "#9A9796",
+    "accent": "#F25A2B",
+    "accent2": "#FFFFFF",
+    "ink": "#F25A2B",
+    "dim": "#18181A",
+    "ghostA": "#F25A2B",
+    "ghostB": "#FFFFFF"
+   }
+  ]
+ },
+ {
+  "key": "mint",
+  "name": "ミント・ターミナル",
+  "grain": 0.8,
+  "ghost": 0.9,
+  "schemes": [
+   {
+    "bg": "#0A0E0D",
+    "fg": "#E6FFF5",
+    "sub": "#7FB9A8",
+    "accent": "#9CFF3A",
+    "accent2": "#2E8C74",
+    "ink": "#E6FFF5",
+    "dim": "#142420",
+    "ghostA": "#FF3B6B",
+    "ghostB": "#2EE6C8"
+   },
+   {
+    "bg": "#3FAE93",
+    "fg": "#0A0E0D",
+    "sub": "#123A31",
+    "accent": "#FFFFFF",
+    "accent2": "#9CFF3A",
+    "ink": "#0A0E0D",
+    "dim": "#39A087",
+    "ghostA": "#FFFFFF",
+    "ghostB": "#0A0E0D"
+   },
+   {
+    "bg": "#F2F2EE",
+    "fg": "#0A0E0D",
+    "sub": "#40504B",
+    "accent": "#2E8C74",
+    "accent2": "#9CFF3A",
+    "ink": "#0A0E0D",
+    "dim": "#E2E4DE",
+    "ghostA": "#2E8C74",
+    "ghostB": "#9CFF3A"
+   }
+  ]
+ },
+ {
+  "key": "specimen",
+  "name": "スペシメン",
+  "grain": 0.6,
+  "ghost": 0.25,
+  "schemes": [
+   {
+    "bg": "#1B1A1C",
+    "fg": "#F2F0EC",
+    "sub": "#A19E99",
+    "accent": "#F2F0EC",
+    "accent2": "#C8B98C",
+    "ink": "#F2F0EC",
+    "dim": "#2A292C",
+    "ghostA": "#6E6A66",
+    "ghostB": "#C8B98C"
+   },
+   {
+    "bg": "#F2F0EC",
+    "fg": "#1B1A1C",
+    "sub": "#5E5B57",
+    "accent": "#1B1A1C",
+    "accent2": "#8A7A4E",
+    "ink": "#1B1A1C",
+    "dim": "#E3E0DA",
+    "ghostA": "#B9B4AD",
+    "ghostB": "#8A7A4E"
+   }
+  ]
+ },
+ {
+  "key": "transit",
+  "name": "トランジット",
+  "grain": 0.8,
+  "ghost": 0.5,
+  "schemes": [
+   {
+    "bg": "#5B582B",
+    "fg": "#FFFFFF",
+    "sub": "#E6E2BC",
+    "accent": "#E8C21A",
+    "accent2": "#1A1A1A",
+    "ink": "#E8C21A",
+    "dim": "#67633A",
+    "ghostA": "#E8C21A",
+    "ghostB": "#1A1A1A"
+   },
+   {
+    "bg": "#1A1A1A",
+    "fg": "#FFFFFF",
+    "sub": "#B8B5A0",
+    "accent": "#E8C21A",
+    "accent2": "#FFFFFF",
+    "ink": "#E8C21A",
+    "dim": "#242424",
+    "ghostA": "#E8C21A",
+    "ghostB": "#7C7A55"
+   },
+   {
+    "bg": "#9C9A94",
+    "fg": "#FFFFFF",
+    "sub": "#F0EEE6",
+    "accent": "#E8C21A",
+    "accent2": "#1A1A1A",
+    "ink": "#1A1A1A",
+    "dim": "#A6A49E",
+    "ghostA": "#E8C21A",
+    "ghostB": "#1A1A1A"
+   }
+  ]
+ },
+ {
+  "key": "blueprint",
+  "name": "ブループリント",
+  "grain": 0.4,
+  "ghost": 0.6,
+  "schemes": [
+   {
+    "bg": "#1B1BE8",
+    "fg": "#FFFFFF",
+    "sub": "#C7C7FF",
+    "accent": "#000000",
+    "accent2": "#FFFFFF",
+    "ink": "#000000",
+    "dim": "#2323F0",
+    "ghostA": "#000000",
+    "ghostB": "#8C8CFF"
+   },
+   {
+    "bg": "#000000",
+    "fg": "#FFFFFF",
+    "sub": "#9A9AFF",
+    "accent": "#1B1BE8",
+    "accent2": "#FFFFFF",
+    "ink": "#1B1BE8",
+    "dim": "#0A0A30",
+    "ghostA": "#1B1BE8",
+    "ghostB": "#FFFFFF"
+   },
+   {
+    "bg": "#FFFFFF",
+    "fg": "#1B1BE8",
+    "sub": "#5A5AF0",
+    "accent": "#000000",
+    "accent2": "#1B1BE8",
+    "ink": "#1B1BE8",
+    "dim": "#EDEDFF",
+    "ghostA": "#000000",
+    "ghostB": "#8C8CFF"
+   }
+  ]
+ },
+ {
+  "key": "rouge",
+  "name": "ルージュ・グラデ",
+  "grain": 0.4,
+  "ghost": 0.4,
+  "schemes": [
+   {
+    "bg": "#E4E2E0",
+    "fg": "#141414",
+    "sub": "#6B6866",
+    "accent": "#D40F1C",
+    "accent2": "#141414",
+    "ink": "#141414",
+    "dim": "#D8D6D4",
+    "ghostA": "#D40F1C",
+    "ghostB": "#6B6866"
+   },
+   {
+    "bg": "#140405",
+    "fg": "#FFFFFF",
+    "sub": "#C98A8E",
+    "accent": "#E3141F",
+    "accent2": "#FFFFFF",
+    "ink": "#E3141F",
+    "dim": "#220A0C",
+    "ghostA": "#E3141F",
+    "ghostB": "#FFFFFF"
+   }
+  ]
+ },
+ {
+  "key": "mono",
+  "name": "モノ・RGB",
+  "grain": 0.9,
+  "ghost": 1.3,
+  "schemes": [
+   {
+    "bg": "#3B3D41",
+    "fg": "#FFFFFF",
+    "sub": "#B9BBBF",
+    "accent": "#FFFFFF",
+    "accent2": "#FFE34D",
+    "ink": "#1A1B1D",
+    "dim": "#45474C",
+    "ghostA": "#FF2A2A",
+    "ghostB": "#2AA8FF"
+   },
+   {
+    "bg": "#141517",
+    "fg": "#FFFFFF",
+    "sub": "#9EA0A4",
+    "accent": "#FFE34D",
+    "accent2": "#FFFFFF",
+    "ink": "#FFFFFF",
+    "dim": "#1E1F22",
+    "ghostA": "#FF2A2A",
+    "ghostB": "#2AFF7A"
+   },
+   {
+    "bg": "#000000",
+    "fg": "#FFFFFF",
+    "sub": "#D2D2D2",
+    "accent": "#FFFFFF",
+    "accent2": "#BDBDBD",
+    "ink": "#FFFFFF",
+    "dim": "#1E1E1E",
+    "ghostA": "#9A9A9A",
+    "ghostB": "#5E5E5E"
+   }
+  ]
+ },
+ {
+  "key": "sakura",
+  "name": "サクラ",
+  "grain": 0.35,
+  "ghost": 0.45,
+  "schemes": [
+   {
+    "bg": "#F8E4EB",
+    "fg": "#4A1434",
+    "sub": "#8A4A69",
+    "accent": "#D93A74",
+    "accent2": "#6F8F4E",
+    "ink": "#4A1434",
+    "dim": "#F0D3DE",
+    "ghostA": "#EC6A9A",
+    "ghostB": "#9A8AE6"
+   },
+   {
+    "bg": "#26091B",
+    "fg": "#FCE8F0",
+    "sub": "#D69DB6",
+    "accent": "#FF86B0",
+    "accent2": "#B9E0A2",
+    "ink": "#FCE8F0",
+    "dim": "#351127",
+    "ghostA": "#FF5C95",
+    "ghostB": "#8A78FF"
+   },
+   {
+    "bg": "#E77FA3",
+    "fg": "#3A0B26",
+    "sub": "#65173F",
+    "accent": "#3A0B26",
+    "accent2": "#FFF3F7",
+    "ink": "#3A0B26",
+    "dim": "#DE7499",
+    "ghostA": "#B4205A",
+    "ghostB": "#6A4CC8"
+   },
+   {
+    "bg": "#FFFAF8",
+    "fg": "#A01E4A",
+    "sub": "#B45F7E",
+    "accent": "#E0457F",
+    "accent2": "#4A1434",
+    "ink": "#A01E4A",
+    "dim": "#F8ECEE",
+    "ghostA": "#F07AA4",
+    "ghostB": "#A898EA"
+   }
+  ]
+ },
+ {
+  "key": "ocean",
+  "name": "深海",
+  "grain": 0.6,
+  "ghost": 0.75,
+  "schemes": [
+   {
+    "bg": "#031A2E",
+    "fg": "#E4FAFF",
+    "sub": "#7FB2C8",
+    "accent": "#1FD2E6",
+    "accent2": "#4C7DFF",
+    "ink": "#E4FAFF",
+    "dim": "#0A2842",
+    "ghostA": "#1FD2E6",
+    "ghostB": "#3B5BFF"
+   },
+   {
+    "bg": "#0B5566",
+    "fg": "#FFFFFF",
+    "sub": "#A9E3EA",
+    "accent": "#04182A",
+    "accent2": "#7FF3FF",
+    "ink": "#E4FAFF",
+    "dim": "#0E6173",
+    "ghostA": "#27E3F2",
+    "ghostB": "#031A2E"
+   },
+   {
+    "bg": "#DCF1F2",
+    "fg": "#06243A",
+    "sub": "#3E6A7C",
+    "accent": "#0A7F98",
+    "accent2": "#3B5BFF",
+    "ink": "#06243A",
+    "dim": "#CBE6E8",
+    "ghostA": "#16B4CC",
+    "ghostB": "#5A6BFF"
+   },
+   {
+    "bg": "#01060D",
+    "fg": "#7FF6FF",
+    "sub": "#3E9AAE",
+    "accent": "#FFFFFF",
+    "accent2": "#2E6BFF",
+    "ink": "#7FF6FF",
+    "dim": "#081521",
+    "ghostA": "#2E6BFF",
+    "ghostB": "#00FFC2"
+   }
+  ]
+ },
+ {
+  "key": "sunset",
+  "name": "夕焼けグラデ",
+  "grain": 0.55,
+  "ghost": 0.6,
+  "schemes": [
+   {
+    "bg": "#2A0F44",
+    "fg": "#FFF0DC",
+    "sub": "#E6A98F",
+    "accent": "#FF7A30",
+    "accent2": "#FF4A86",
+    "ink": "#FFB347",
+    "dim": "#361456",
+    "ghostA": "#FF7A30",
+    "ghostB": "#B84BFF"
+   },
+   {
+    "bg": "#FF8A3D",
+    "fg": "#2A0F44",
+    "sub": "#5A1F55",
+    "accent": "#2A0F44",
+    "accent2": "#FFF0DC",
+    "ink": "#2A0F44",
+    "dim": "#F57F32",
+    "ghostA": "#E0306A",
+    "ghostB": "#7A2BC0"
+   },
+   {
+    "bg": "#B8325F",
+    "fg": "#FFF3E4",
+    "sub": "#FFC7A8",
+    "accent": "#FFC15E",
+    "accent2": "#2A0F44",
+    "ink": "#FFF3E4",
+    "dim": "#A92C56",
+    "ghostA": "#FFC15E",
+    "ghostB": "#2A0F44"
+   },
+   {
+    "bg": "#FFE4CF",
+    "fg": "#3A1250",
+    "sub": "#8A4A6A",
+    "accent": "#F2562E",
+    "accent2": "#8A3FD1",
+    "ink": "#3A1250",
+    "dim": "#F7D6BE",
+    "ghostA": "#FF6A3D",
+    "ghostB": "#9A4BE0"
+   }
+  ]
+ },
+ {
+  "key": "forest",
+  "name": "森の手帖",
+  "grain": 0.7,
+  "ghost": 0.45,
+  "schemes": [
+   {
+    "bg": "#1D291B",
+    "fg": "#EFE9D6",
+    "sub": "#A8B08A",
+    "accent": "#B7C95A",
+    "accent2": "#C4833F",
+    "ink": "#EFE9D6",
+    "dim": "#263423",
+    "ghostA": "#8FB04A",
+    "ghostB": "#C4833F"
+   },
+   {
+    "bg": "#EDE6D1",
+    "fg": "#22301F",
+    "sub": "#5D6647",
+    "accent": "#4F7A35",
+    "accent2": "#8A5A32",
+    "ink": "#22301F",
+    "dim": "#E1D9C2",
+    "ghostA": "#6F9A45",
+    "ghostB": "#B0703A"
+   },
+   {
+    "bg": "#4A3526",
+    "fg": "#F2EAD3",
+    "sub": "#CDB894",
+    "accent": "#B7C95A",
+    "accent2": "#EFE9D6",
+    "ink": "#B7C95A",
+    "dim": "#55402F",
+    "ghostA": "#8FB04A",
+    "ghostB": "#D9A441"
+   },
+   {
+    "bg": "#A9BC96",
+    "fg": "#1A2618",
+    "sub": "#34482F",
+    "accent": "#1A2618",
+    "accent2": "#F2EAD3",
+    "ink": "#1A2618",
+    "dim": "#9FB38C",
+    "ghostA": "#4F7A35",
+    "ghostB": "#8A5A32"
+   }
+  ]
+ },
+ {
+  "key": "vapor",
+  "name": "ヴェイパー",
+  "grain": 0.5,
+  "ghost": 0.95,
+  "schemes": [
+   {
+    "bg": "#3A2A6E",
+    "fg": "#FFFFFF",
+    "sub": "#D6C8FF",
+    "accent": "#FF8FD8",
+    "accent2": "#7DF9FF",
+    "ink": "#7DF9FF",
+    "dim": "#45347C",
+    "ghostA": "#FF71CE",
+    "ghostB": "#01CDFE"
+   },
+   {
+    "bg": "#FFC6EC",
+    "fg": "#3A2A6E",
+    "sub": "#74489A",
+    "accent": "#7A3BFF",
+    "accent2": "#0F9FC8",
+    "ink": "#3A2A6E",
+    "dim": "#F7B8E2",
+    "ghostA": "#2EC8F0",
+    "ghostB": "#B04BFF"
+   },
+   {
+    "bg": "#8FEAF2",
+    "fg": "#35246A",
+    "sub": "#4A3C8A",
+    "accent": "#35246A",
+    "accent2": "#FF4FC0",
+    "ink": "#35246A",
+    "dim": "#82E0EA",
+    "ghostA": "#FF5CC8",
+    "ghostB": "#8A5CFF"
+   },
+   {
+    "bg": "#1A1030",
+    "fg": "#FFFB96",
+    "sub": "#B9A6E0",
+    "accent": "#05FFA1",
+    "accent2": "#FF71CE",
+    "ink": "#FF71CE",
+    "dim": "#241840",
+    "ghostA": "#FF71CE",
+    "ghostB": "#01CDFE"
+   }
+  ]
+ },
+ {
+  "key": "newsprint",
+  "name": "新聞",
+  "grain": 0.9,
+  "ghost": 0.45,
+  "schemes": [
+   {
+    "bg": "#E6E5E0",
+    "fg": "#111111",
+    "sub": "#4E4E4C",
+    "accent": "#D8141B",
+    "accent2": "#0A82C8",
+    "ink": "#111111",
+    "dim": "#D8D7D1",
+    "ghostA": "#E4007F",
+    "ghostB": "#00A0E9"
+   },
+   {
+    "bg": "#111111",
+    "fg": "#F2F2EE",
+    "sub": "#A5A5A0",
+    "accent": "#F5D300",
+    "accent2": "#E4007F",
+    "ink": "#F2F2EE",
+    "dim": "#1F1F1F",
+    "ghostA": "#E4007F",
+    "ghostB": "#00A0E9"
+   },
+   {
+    "bg": "#D8141B",
+    "fg": "#FFFFFF",
+    "sub": "#FFD6D0",
+    "accent": "#111111",
+    "accent2": "#F5D300",
+    "ink": "#FFFFFF",
+    "dim": "#C71118",
+    "ghostA": "#111111",
+    "ghostB": "#F5D300"
+   }
+  ]
+ },
+ {
+  "key": "synth80",
+  "name": "シンセ80s",
+  "grain": 0.4,
+  "ghost": 1.0,
+  "schemes": [
+   {
+    "bg": "#0B0414",
+    "fg": "#FF4FD8",
+    "sub": "#A98BFF",
+    "accent": "#22E6FF",
+    "accent2": "#FFE45C",
+    "ink": "#22E6FF",
+    "dim": "#1A0B2E",
+    "ghostA": "#22E6FF",
+    "ghostB": "#6A3BFF"
+   },
+   {
+    "bg": "#0B0414",
+    "fg": "#22E6FF",
+    "sub": "#8FA8FF",
+    "accent": "#E62EBE",
+    "accent2": "#FFE45C",
+    "ink": "#FF4FD8",
+    "dim": "#140A28",
+    "ghostA": "#FF4FD8",
+    "ghostB": "#FFE45C"
+   },
+   {
+    "bg": "#1C0A3A",
+    "fg": "#FFFFFF",
+    "sub": "#FFB0E8",
+    "accent": "#E62EBE",
+    "accent2": "#22E6FF",
+    "ink": "#FFE45C",
+    "dim": "#26104C",
+    "ghostA": "#FF2E88",
+    "ghostB": "#22E6FF"
+   },
+   {
+    "bg": "#FF2E88",
+    "fg": "#0B0414",
+    "sub": "#3A0A30",
+    "accent": "#0B0414",
+    "accent2": "#22E6FF",
+    "ink": "#0B0414",
+    "dim": "#F0287E",
+    "ghostA": "#22E6FF",
+    "ghostB": "#FFE45C"
+   }
+  ]
+ },
+ {
+  "key": "kraft",
+  "name": "クラフト紙",
+  "grain": 0.7,
+  "ghost": 0.5,
+  "schemes": [
+   {
+    "bg": "#C49A6C",
+    "fg": "#1A1410",
+    "sub": "#46301E",
+    "accent": "#B8361B",
+    "accent2": "#F3E9D2",
+    "ink": "#1A1410",
+    "dim": "#B98F62",
+    "ghostA": "#C33A1F",
+    "ghostB": "#2E5E8C"
+   },
+   {
+    "bg": "#F1E6CF",
+    "fg": "#1A1410",
+    "sub": "#6A5540",
+    "accent": "#C33A1F",
+    "accent2": "#2E5E8C",
+    "ink": "#1A1410",
+    "dim": "#E6D8BC",
+    "ghostA": "#C33A1F",
+    "ghostB": "#2E5E8C"
+   },
+   {
+    "bg": "#1E1A17",
+    "fg": "#F1E6CF",
+    "sub": "#B8A68A",
+    "accent": "#D9642E",
+    "accent2": "#C49A6C",
+    "ink": "#C49A6C",
+    "dim": "#2A2521",
+    "ghostA": "#C49A6C",
+    "ghostB": "#C33A1F"
+   },
+   {
+    "bg": "#2E5E8C",
+    "fg": "#F6EEDD",
+    "sub": "#C9D6E2",
+    "accent": "#F1E6CF",
+    "accent2": "#C33A1F",
+    "ink": "#F1E6CF",
+    "dim": "#34669A",
+    "ghostA": "#C49A6C",
+    "ghostB": "#1A1410"
+   }
+  ]
+ },
+ {
+  "key": "candy",
+  "name": "キャンディ",
+  "grain": 0.15,
+  "ghost": 0.4,
+  "schemes": [
+   {
+    "bg": "#BDF0E2",
+    "fg": "#3E2A8C",
+    "sub": "#5A4A9A",
+    "accent": "#EE3A88",
+    "accent2": "#FFB020",
+    "ink": "#3E2A8C",
+    "dim": "#AEE8D8",
+    "ghostA": "#FF5FA2",
+    "ghostB": "#8A6BFF"
+   },
+   {
+    "bg": "#FFDDEB",
+    "fg": "#7A2BB8",
+    "sub": "#A2468E",
+    "accent": "#EE3A88",
+    "accent2": "#2FC2B8",
+    "ink": "#7A2BB8",
+    "dim": "#FDD0E2",
+    "ghostA": "#FF5FA2",
+    "ghostB": "#3FB8FF"
+   },
+   {
+    "bg": "#FFF0A0",
+    "fg": "#B01E5E",
+    "sub": "#9A4A2A",
+    "accent": "#3F8FFF",
+    "accent2": "#FF5FA2",
+    "ink": "#B01E5E",
+    "dim": "#F8E68C",
+    "ghostA": "#FF5FA2",
+    "ghostB": "#3FB8FF"
+   },
+   {
+    "bg": "#6A33B0",
+    "fg": "#FFF3FA",
+    "sub": "#E3C8FF",
+    "accent": "#FF8FC8",
+    "accent2": "#7FF0E0",
+    "ink": "#7FF0E0",
+    "dim": "#7439BD",
+    "ghostA": "#FF8FC8",
+    "ghostB": "#7FF0E0"
+   }
+  ]
+ },
+ {
+  "key": "acid",
+  "name": "アシッド",
+  "grain": 1.0,
+  "ghost": 1.25,
+  "schemes": [
+   {
+    "bg": "#050505",
+    "fg": "#C6FF00",
+    "sub": "#86A800",
+    "accent": "#FF2BD6",
+    "accent2": "#FFFFFF",
+    "ink": "#C6FF00",
+    "dim": "#111A00",
+    "ghostA": "#FF2BD6",
+    "ghostB": "#3D5BFF"
+   },
+   {
+    "bg": "#C6FF00",
+    "fg": "#050505",
+    "sub": "#2A3A00",
+    "accent": "#050505",
+    "accent2": "#FF2BD6",
+    "ink": "#050505",
+    "dim": "#B8F000",
+    "ghostA": "#FF2BD6",
+    "ghostB": "#2B3DFF"
+   },
+   {
+    "bg": "#FF2BD6",
+    "fg": "#050505",
+    "sub": "#3A0030",
+    "accent": "#C6FF00",
+    "accent2": "#050505",
+    "ink": "#050505",
+    "dim": "#F024C8",
+    "ghostA": "#C6FF00",
+    "ghostB": "#2B3DFF"
+   },
+   {
+    "bg": "#0A0A0A",
+    "fg": "#FFFFFF",
+    "sub": "#9A9A9A",
+    "accent": "#C6FF00",
+    "accent2": "#FF2BD6",
+    "ink": "#FF2BD6",
+    "dim": "#171717",
+    "ghostA": "#C6FF00",
+    "ghostB": "#FF2BD6"
+   }
+  ]
+ },
+ {
+  "key": "sumi",
+  "name": "墨と朱",
+  "grain": 0.6,
+  "ghost": 0.35,
+  "schemes": [
+   {
+    "bg": "#EFE5CF",
+    "fg": "#16130F",
+    "sub": "#5E574C",
+    "accent": "#B83A22",
+    "accent2": "#16130F",
+    "ink": "#16130F",
+    "dim": "#E3D8BF",
+    "ghostA": "#9A9284",
+    "ghostB": "#CC4A2E"
+   },
+   {
+    "bg": "#121110",
+    "fg": "#EFE8D8",
+    "sub": "#9A9286",
+    "accent": "#D9402A",
+    "accent2": "#EFE8D8",
+    "ink": "#EFE8D8",
+    "dim": "#1E1C1A",
+    "ghostA": "#5C5750",
+    "ghostB": "#D9402A"
+   },
+   {
+    "bg": "#B3301D",
+    "fg": "#FFF6E8",
+    "sub": "#FFD2C0",
+    "accent": "#16130F",
+    "accent2": "#FFF6E8",
+    "ink": "#FFF6E8",
+    "dim": "#A42B1A",
+    "ghostA": "#16130F",
+    "ghostB": "#E8A070"
+   },
+   {
+    "bg": "#BAB4A7",
+    "fg": "#16130F",
+    "sub": "#3E3A33",
+    "accent": "#A82A18",
+    "accent2": "#16130F",
+    "ink": "#16130F",
+    "dim": "#AFA99C",
+    "ghostA": "#6E685E",
+    "ghostB": "#B8321E"
+   }
+  ]
+ },
+ {
+  "key": "gold",
+  "name": "金夜",
+  "grain": 0.6,
+  "ghost": 0.5,
+  "schemes": [
+   {
+    "bg": "#0A0907",
+    "fg": "#F3E7C4",
+    "sub": "#B39A62",
+    "accent": "#D4AF37",
+    "accent2": "#F3E7C4",
+    "ink": "#D4AF37",
+    "dim": "#17140E",
+    "ghostA": "#D4AF37",
+    "ghostB": "#7A5230"
+   },
+   {
+    "bg": "#C9A24A",
+    "fg": "#0A0907",
+    "sub": "#3A2C12",
+    "accent": "#0A0907",
+    "accent2": "#FFF4D6",
+    "ink": "#0A0907",
+    "dim": "#BD9740",
+    "ghostA": "#8A5A1A",
+    "ghostB": "#3A2C12"
+   },
+   {
+    "bg": "#0B1024",
+    "fg": "#F3E7C4",
+    "sub": "#A89A78",
+    "accent": "#D4AF37",
+    "accent2": "#F3E7C4",
+    "ink": "#D4AF37",
+    "dim": "#141A33",
+    "ghostA": "#D4AF37",
+    "ghostB": "#3A5AA8"
+   },
+   {
+    "bg": "#2B0A14",
+    "fg": "#F6EBD0",
+    "sub": "#C9A987",
+    "accent": "#D4AF37",
+    "accent2": "#F6EBD0",
+    "ink": "#D4AF37",
+    "dim": "#38101F",
+    "ghostA": "#D4AF37",
+    "ghostB": "#9A2A4E"
+   }
+  ]
+ }
+]

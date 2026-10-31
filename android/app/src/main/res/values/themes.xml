@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FollowSound" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:statusBarColor">#0B0D12</item>
+        <item name="android:navigationBarColor">#0B0D12</item>
+        <item name="android:windowBackground">#0B0D12</item>
+        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorAccent">#1FD2E6</item>
+    </style>
+</resources>

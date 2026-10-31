@@ -1,0 +1,24 @@
+# 构建产物
+dist/
+build/
+DerivedData/
+*.iconset/
+macos/VERSION.lock
+
+# 依赖
+node_modules/
+windows/node_modules/
+
+# Android 构建中间物（assets 由 gradle 从 ../shared 同步，不入库）
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/
+android/local.properties
+android/.idea/
+*.iml
+*.keystore
+
+# 系统
+.DS_Store
+*.log

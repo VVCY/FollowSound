@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">随响</string>
+    <string name="overlay_on">开启悬浮窗</string>
+    <string name="overlay_off">关闭悬浮窗</string>
+    <string name="check_update">检查更新</string>
+    <string name="overlay_channel">悬浮光带</string>
+</resources>

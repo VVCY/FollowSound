@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>随响 FollowSound</title>
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+
+  /* chrome=1 时出现的一层轻控制条：Android 端和小窗调试用 */
+  .chrome {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    display: none; gap: 10px; align-items: center;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(10, 12, 16, .74);
+    backdrop-filter: blur(14px);
+    font: 13px/1.3 -apple-system, "SF Pro Text", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+    color: #e8ecf3;
+  }
+  .chrome.on { display: flex; flex-wrap: wrap; }
+  .chrome label { opacity: .6; }
+  .chrome select, .chrome button {
+    font: inherit; color: #e8ecf3; background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
+    padding: 6px 10px; outline: none;
+  }
+  .chrome button.on { background: #fff; color: #0b0d12; border-color: #fff; }
+  .chrome input[type=range] { width: 120px; accent-color: #fff; }
+  .chrome .grow { flex: 1; }
+  .hint { position: fixed; inset: 0; display: grid; place-items: center;
+    font: 15px/1.6 -apple-system, "PingFang SC", sans-serif; color: #cbd3e1;
+    background: rgba(8,10,14,.55); backdrop-filter: blur(2px); }
+  .hint.hide { display: none; }
+  .hint button {
+    font: inherit; color: #0b0d12; background: #fff; border: 0; border-radius: 999px;
+    padding: 10px 22px; margin-top: 14px; cursor: pointer;
+  }
+  .hint .box { text-align: center; max-width: 320px; padding: 24px; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<div class="chrome" id="chrome">
+  <label>特效</label>
+  <select id="style"></select>
+  <label>配色</label>
+  <select id="theme"></select>
+  <label>高度</label>
+  <input type="range" id="height" min="80" max="400" step="1">
+  <span id="heightVal">180</span>
+  <span class="grow"></span>
+  <button id="micBtn">接麦克风</button>
+</div>
+
+<div class="hint" id="hint">
+  <div class="box">
+    <div>点一下，让声音出现在屏幕上。</div>
+    <button id="grant">允许麦克风</button>
+  </div>
+</div>
+
+<script src="themes.js"></script>
+<script src="visualizer.js"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var isDemo = q.get('demo') === '1';
+  var stage = document.getElementById('stage');
+  var fs = FollowSound.create(stage, {
+    style: q.get('style') || localStorage.getItem('fs.style') || 'band',
+    theme: q.get('theme') || localStorage.getItem('fs.theme') || 'ocean',
+    height: Number(q.get('height') || localStorage.getItem('fs.height') || 180)
+  });
+  window.fs = fs;
+  fs.start();
+
+  // ---- 控制条 ----
+  var chrome = document.getElementById('chrome');
+  if (q.get('chrome') === '1') {
+    chrome.classList.add('on');
+    var selStyle = document.getElementById('style');
+    var selTheme = document.getElementById('theme');
+    FollowSound.STYLES.forEach(function (s) {
+      var o = document.createElement('option'); o.value = s.key; o.textContent = s.title;
+      selStyle.appendChild(o);
+    });
+    (window.FS_THEMES || []).forEach(function (t) {
+      var o = document.createElement('option'); o.value = t.key; o.textContent = t.name;
+      selTheme.appendChild(o);
+    });
+    selStyle.value = fs.style;
+    selTheme.value = fs.themeKey;
+    var range = document.getElementById('height');
+    var hv = document.getElementById('heightVal');
+    range.value = fs.getHeight(); hv.textContent = fs.getHeight();
+
+    selStyle.onchange = function () { fs.setStyle(this.value); localStorage.setItem('fs.style', this.value); };
+    selTheme.onchange = function () { fs.setTheme(this.value); localStorage.setItem('fs.theme', this.value); };
+    range.oninput = function () { fs.setHeight(Number(this.value)); hv.textContent = this.value; };
+    range.onchange = function () { localStorage.setItem('fs.height', this.value); };
+
+    var micBtn = document.getElementById('micBtn');
+    micBtn.classList.toggle('on', fs.isMic());
+    micBtn.onclick = function () {
+      if (fs.isMic()) { fs.detachMic(); micBtn.classList.remove('on'); }
+      else { fs.attachMic().then(function () { micBtn.classList.add('on'); }).catch(function () {}); }
+    };
+  }
+
+  // ---- 麦克风 ----
+  var hint = document.getElementById('hint');
+  function grant() {
+    fs.attachMic().then(function () { hint.classList.add('hide'); }).catch(function () {
+      hint.querySelector('.box').innerHTML = '<div>麦克风没有打开。可以在系统设置里允许「随响」使用麦克风，或者先看演示动画。</div>';
+      fs.setDemo(true);
+      setTimeout(function () { hint.classList.add('hide'); }, 1600);
+    });
+  }
+  if (isDemo) { hint.classList.add('hide'); fs.setDemo(true); }
+  else {
+    document.getElementById('grant').onclick = grant;
+    // 桌面端（Electron / 已授权环境）不需要点击，直接试
+    if (q.get('autostart') === '1' || location.protocol === 'file:') {
+      fs.attachMic().then(function () { hint.classList.add('hide'); }).catch(function () { hint.classList.add('hide'); fs.setDemo(true); });
+    }
+  }
+
+  // 供宿主（Electron 主进程 / Android）调用
+  window.fsSetStyle = function (k) { fs.setStyle(k); };
+  window.fsSetTheme = function (k) { fs.setTheme(k); };
+  window.fsSetHeight = function (h) { fs.setHeight(h); };
+  window.fsCloseHint = function () { hint.classList.add('hide'); };
+})();
+</script>
+</body>
+</html>

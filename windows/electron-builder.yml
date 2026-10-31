@@ -1,0 +1,44 @@
+appId: app.followsound.windows
+productName: FollowSound
+copyright: © 2026 VVCY · 随响 FollowSound
+
+directories:
+  output: ../dist/windows
+  buildResources: build
+
+files:
+  - src/**
+  - package.json
+  - "!**/*.map"
+
+# 视觉核心（themes.js / visualizer.js / player.html）随包带一份，运行时从 resources/shared 读
+extraResources:
+  - from: ../shared
+    to: shared
+    filter: ["**/*"]
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: zip
+      arch: [x64]
+  icon: build/icon.ico
+  artifactName: FollowSound-Windows-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 随响 FollowSound
+  artifactName: FollowSound-Windows-${version}-Setup.${ext}
+
+# 自动更新走 GitHub Releases：electron-builder 会生成 latest.yml，electron-updater 读它
+publish:
+  provider: github
+  owner: VVCY
+  repo: FollowSound
+  releaseType: release

@@ -1,0 +1,22 @@
+{
+  "name": "followsound",
+  "productName": "FollowSound",
+  "version": "1.0.0",
+  "description": "随响 FollowSound —— 把说话的音量变成屏幕底部的光带",
+  "main": "src/main.js",
+  "author": { "name": "VVCY", "url": "https://github.com/VVCY" },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never",
+    "release": "electron-builder --win --publish always"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  }
+}

@@ -1,0 +1,173 @@
+name: release
+
+# 打一个 v* 标签（或在 Actions 里手动跑）就产出三端安装包，并挂到同一个 GitHub Release。
+# 自动更新读的就是这个 Release，所以资源命名必须严格遵守 docs/RELEASE.md 的约定。
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（不带 v，例如 1.0.0）'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
+
+env:
+  FS_VERSION: ${{ github.event.inputs.version || '' }}
+
+jobs:
+  macos:
+    name: macOS 通用二进制
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 版本号
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "v=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "v=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 构建 + 打 zip/dmg
+        run: VERSION=${{ steps.ver.outputs.v }} ./macos/package.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/macos/*
+          if-no-files-found: error
+
+  windows:
+    name: Windows 安装包
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 版本号
+        id: ver
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "v=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "v=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 安装依赖
+        working-directory: windows
+        run: npm install
+
+      - name: 同步版本号
+        working-directory: windows
+        shell: bash
+        run: npm version ${{ steps.ver.outputs.v }} --no-git-tag-version --allow-same-version
+
+      - name: 打包（不发布，由 publish 任务统一挂资源）
+        working-directory: windows
+        run: npx electron-builder --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/windows/*.exe
+            dist/windows/*.zip
+            dist/windows/latest.yml
+          if-no-files-found: error
+
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: 版本号
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "v=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "v=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 构建 release APK
+        working-directory: android
+        run: |
+          gradle assembleRelease --no-daemon \
+            -PfsVersionName=${{ steps.ver.outputs.v }} \
+            -PfsVersionCode=${{ github.run_number }}
+
+      - name: 按发布约定改名
+        run: |
+          mkdir -p dist/android
+          V=${{ steps.ver.outputs.v }}
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/android/FollowSound-Android-$V.apk"
+          cp "dist/android/FollowSound-Android-$V.apk" dist/android/FollowSound-Android.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/android/*
+          if-no-files-found: error
+
+  publish:
+    name: 汇总发布
+    needs: [macos, windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: 生成固定别名的安装包
+        run: |
+          set -e
+          ls -la dist
+          # Windows：NSIS 产出的文件名带版本号，再复制一份固定名给官网用
+          if ls dist/FollowSound-Windows-*-Setup.exe >/dev/null 2>&1; then
+            cp dist/FollowSound-Windows-*-Setup.exe dist/FollowSound-Windows-Setup.exe
+          fi
+          # 校验值
+          (cd dist && shasum -a 256 *.zip *.exe *.apk 2>/dev/null > SHA256SUMS.txt || true)
+          cat dist/SHA256SUMS.txt || true
+
+      - name: 版本号
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "v=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "v=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.v }}
+          name: 随响 FollowSound v${{ steps.ver.outputs.v }}
+          body_path: docs/release-notes.md
+          files: |
+            dist/*
+          fail_on_unmatched_files: false
