@@ -369,7 +369,7 @@
     }
 
     function readDemo() {
-      target = 0.45 + 0.35 * Math.abs(Math.sin(time * 1.6));
+      target = 0.55 + 0.30 * Math.abs(Math.sin(time * 1.6));
       for (var i = 0; i < BANDS; i++) {
         var v = Math.abs(Math.sin(time * 3.1 + i * 0.45)) * 0.85;
         bands[i] = Math.min(1, v > bands[i] ? v : bands[i] * 0.82 + v * 0.18);
