@@ -17,6 +17,7 @@
 | Android 8+ | [FollowSound-Android.apk](https://github.com/VVCY/FollowSound/releases/latest/download/FollowSound-Android.apk) |
 
 官网：https://vvcy.github.io/FollowSound/
+备用入口（国内更常打得开）：https://followsound.pages.dev/
 
 > 打不开 GitHub 时，在任意直链前面加上 `https://gh-proxy.com/` 即可加速，例如
 > `https://gh-proxy.com/https://github.com/VVCY/FollowSound/releases/latest/download/FollowSound-Android.apk`。

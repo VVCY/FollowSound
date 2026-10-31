@@ -157,22 +157,29 @@ Cloudflare Pages（国内备用入口）。
 目的只有一个：GitHub Pages 在国内经常慢或打不开。**Gitee Pages 已无解**（2024-05 下线，
 官方称暂不上线）；国内云厂商的静态托管要绑备案域名才有大陆节点，所以走 Cloudflare 这条免备案的路。
 
-两种接法，**二选一**：
+**现状：已接好，push 即自动发布。** 访问地址 https://followsound.pages.dev/
 
-**A. 控制台连 Git（推荐，之后 push 自动部署）**
+项目 `followsound` 已通过控制台连到 GitHub 仓库，配置如下（改配置在项目 Settings →
+Build & deployments）：
 
-Workers & Pages → Create → Pages → Connect to Git → 选 `VVCY/FollowSound`，然后：
-
-| 字段 | 填什么 |
+| 字段 | 值 |
 | --- | --- |
-| Project name | `followsound`（决定 `followsound.pages.dev`，被占用就换一个） |
+| Project name | `followsound`（决定 `followsound.pages.dev`） |
 | Production branch | `main` |
 | Framework preset | `None` |
 | Build command | **留空** |
 | Build output directory | `docs` |
 | Root directory | 留空（仓库根） |
 
-**B. 本地 wrangler**
+所以日常发布就是**推 main**：CF 收到 webhook 后重新部署，不需要跑任何命令。
+GitHub App 授权时选的是「仅选定的仓库」→ 只给了 `VVCY/FollowSound` 一个，换仓库要回
+GitHub → Settings → Applications 里改。
+
+重新接线（换了账号或删了项目时）：Workers & Pages → 创建应用程序 → 继续前往 Pages →
+导入现有 Git 存储库 → GitHub → 选仓库 → 按上表填。云厂商的 Pages 页面现在默认进
+"Create project" 新流程（Workers + 静态资源），要点页脚那行 **「继续前往 Pages」** 才回到经典流程。
+
+**B. 本地 wrangler**（不走 Git 时）
 
 ```bash
 npx wrangler login          # 浏览器授权一次

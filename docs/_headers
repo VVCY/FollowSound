@@ -9,14 +9,17 @@
   X-Frame-Options: DENY
   Permissions-Policy: microphone=(self)
 
-/assets/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+# 一个文件只让它命中一条规则：两条规则同时命中时 Cloudflare 会把两个 Cache-Control
+# 拼在一起（实测 `max-age=604800, ..., max-age=3600`），语义含糊。文件名没有内容哈希，
+# 所以 JS/CSS 只给 1 小时，图片给 7 天。
+/*.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
 /*.css
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-/*.js
-  Cache-Control: public, max-age=3600
+/*.png
+  Cache-Control: public, max-age=604800
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate

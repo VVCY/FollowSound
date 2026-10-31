@@ -40,5 +40,30 @@ app.whenReady().then(async () => {
   await new Promise((r) => setTimeout(r, 600));
   fs.writeFileSync('/tmp/site-dl.png', (await win.webContents.capturePage()).toPNG());
   console.log('RESULT ' + JSON.stringify(out, null, 2));
+
+  // --live：把两个线上站点和本地 docs/index.html 对一遍，确认发出去的是同一份
+  if (process.argv.includes('--live')) {
+    const crypto = require('crypto');
+    const local = crypto.createHash('sha256').update(fs.readFileSync(SITE)).digest('hex');
+    const hosts = ['https://vvcy.github.io/FollowSound/', 'https://followsound.pages.dev/'];
+    const live = [];
+    for (const url of hosts) {
+      try {
+        const r = await fetch(url, { redirect: 'follow' });
+        const buf = Buffer.from(await r.arrayBuffer());
+        live.push({
+          url,
+          status: r.status,
+          bytes: buf.length,
+          sameAsLocal: crypto.createHash('sha256').update(buf).digest('hex') === local,
+          nosniff: r.headers.get('x-content-type-options'),
+          jsCache: null
+        });
+      } catch (e) {
+        live.push({ url, error: e.message });
+      }
+    }
+    console.log('LIVE ' + JSON.stringify(live, null, 2));
+  }
   app.quit();
 });
